@@ -1,0 +1,9 @@
+${AnsiColor.BLACK}
+${AnsiBackground.BLUE}   ___             _                 _      _                      _
+${AnsiBackground.BLUE}  | __|    ___    | |_    _  _    __| |    (_)    __ _    _ _     | |_     ___     ___
+${AnsiBackground.BLUE}  | _|    (_-<    |  _|  | +| |  / _` |    | |   / _` |  | ' \    |  _|   / -_)   (_-<
+${AnsiBackground.BLUE}  |___|   /__/_   _\__|   \_,_|  \__,_|   _|_|_  \__,_|  |_||_|   _\__|   \___|   /__/_
+${AnsiBackground.BLUE}_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|
+${AnsiBackground.BLUE}"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'
+${AnsiBackground.DEFAULT}
+${AnsiColor.DEFAULT}
