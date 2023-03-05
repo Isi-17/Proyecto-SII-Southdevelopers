@@ -1,11 +1,16 @@
 package com.uma.southdevelopers;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
-@SpringBootApplication
+
 public class StudentManagementApplication {
     public static void main(String[] args) {
-        SpringApplication.run(StudentManagementApplication.class, args);
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("studentManagement");
+        EntityManager em = emf.createEntityManager();
+
+        em.close();
+        emf.close();
     }
 }
