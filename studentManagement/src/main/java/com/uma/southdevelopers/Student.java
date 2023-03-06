@@ -20,7 +20,7 @@ public class Student {
     private String email;
     private Integer phoneNumber;
     private String specialNeeds;
-    private long ID;
+    private Long ID;
     private String school;
 
 
