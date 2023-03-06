@@ -17,6 +17,11 @@ public class Student {
     private String surnames;
     @ManyToMany
     private List<Subject> subjects;
+    private String email;
+    private Integer phoneNumber;
+    private String specialNeeds;
+    private long ID;
+    private String school;
 
 
 }
