@@ -2,9 +2,7 @@ package com.uma.southdevelopers;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -15,12 +13,12 @@ public class Student {
     private String DNI;
     private String name;
     private String surnames;
-    @ManyToMany
+    @ElementCollection(targetClass = Subject.class)
+    @Enumerated(EnumType.STRING)
     private List<Subject> subjects;
     private String email;
     private Integer phoneNumber;
     private String specialNeeds;
-    private Long ID;
     private String school;
 
 

@@ -1,19 +1,34 @@
 package com.uma.southdevelopers;
 
-import lombok.Data;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import java.util.List;
-
-@Entity
-@Data
-public class Subject {
-
-    @Id
-    private String name;
-    @ManyToMany (mappedBy = "subjects")
-    private List<Student> students;
+public enum Subject {
+    LENGUA_CASTELLANA_Y_LITERATURA,
+    HISTORIA_DE_ESPAÑA,
+    INGLÉS_FASE_DE_ACCESO,
+    FRANCÉS_FASE_DE_ACCESO,
+    ALEMÁN_FASE_DE_ACCESO,
+    ITALIANO_FASE_DE_ACCESO,
+    PORTUGUÉS_FASE_DE_ACCESO,
+    INGLÉS_FASE_DE_ADMISIÓN,
+    FRANCÉS_FASE_DE_ADMISIÓN,
+    ALEMÁN_FASE_DE_ADMISIÓN,
+    ITALIANO_FASE_DE_ADMISIÓN,
+    PORTUGUÉS_FASE_DE_ADMISIÓN,
+    FUNDAMENTOS_DEL_ARTE_II,
+    LATÍN_II,
+    MATEMÁTICAS_II,
+    MATEMÁTICAS_APLICADAS_A_LAS_CCSS,
+    ARTES_ESCÉNICAS,
+    BIOLOGÍA,
+    CULTURA_AUDIOVISUAL_II,
+    DIBUJO_TÉCNICO_II,
+    DISEÑO,
+    ECONOMÍA_DE_LA_EMPRESA,
+    FÍSICA,
+    GEOGRAFÍA,
+    GEOLOGÍA,
+    GRIEGO_II,
+    HISTORIA_DE_LA_FILOSOFÍA,
+    HISTORIA_DEL_ARTE,
+    QUÍMICA
 
 }
