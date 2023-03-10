@@ -1,12 +1,14 @@
 package com.uma.southdevelopers;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
 
 @Entity
 @Data
+@AllArgsConstructor
 public class User {
 
     enum Rol {

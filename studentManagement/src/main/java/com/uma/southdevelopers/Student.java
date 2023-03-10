@@ -1,5 +1,6 @@
 package com.uma.southdevelopers;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -7,6 +8,7 @@ import java.util.List;
 
 @Entity
 @Data
+@AllArgsConstructor
 public class Student {
 
     @Id
@@ -17,7 +19,7 @@ public class Student {
     @Enumerated(EnumType.STRING)
     private List<Subject> subjects;
     private String email;
-    private Integer phoneNumber;
+    private String phoneNumber;
     private String specialNeeds;
     private String school;
 
