@@ -10,7 +10,8 @@ import java.util.Date;
 public class Enrolment {
 
 
-    @Id
+    @Id @GeneratedValue
+    private Long id;
     @Temporal(TemporalType.DATE)
     private Date date;
     @OneToOne(fetch = FetchType.LAZY)
