@@ -23,6 +23,8 @@ public class Student {
     @ManyToMany
     private List<SpecialNeeds> specialNeeds;
     private String school;
+    @OneToOne
+    private Enrolment enrolment;
 
 
 }
