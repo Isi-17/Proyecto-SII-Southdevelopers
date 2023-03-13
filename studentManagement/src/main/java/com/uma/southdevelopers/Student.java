@@ -20,7 +20,7 @@ public class Student {
     @ManyToMany
     private List<SpecialNeeds> specialNeeds;
     private String school;
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private Enrolment enrolment;
 
 
