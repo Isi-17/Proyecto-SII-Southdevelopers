@@ -18,7 +18,7 @@ public class Student {
     @ElementCollection(targetClass = Subject.class)
     @Enumerated(EnumType.STRING)
     private List<Subject> subjects;
-    private String email;
+    private String email;           //correo
     private String phoneNumber;
     @ManyToMany
     private List<SpecialNeeds> specialNeeds;
