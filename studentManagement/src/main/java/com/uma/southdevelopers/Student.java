@@ -15,10 +15,7 @@ public class Student {
     private String DNI;
     private String name;
     private String surnames;
-    @ElementCollection(targetClass = Subject.class)
-    @Enumerated(EnumType.STRING)
-    private List<Subject> subjects;
-    private String email;           //correo
+    private String email;
     private String phoneNumber;
     @ManyToMany
     private List<SpecialNeeds> specialNeeds;
