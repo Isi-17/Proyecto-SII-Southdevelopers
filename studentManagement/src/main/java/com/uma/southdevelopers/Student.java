@@ -20,7 +20,8 @@ public class Student {
     private List<Subject> subjects;
     private String email;
     private String phoneNumber;
-    private String specialNeeds;
+    @ManyToMany
+    private List<SpecialNeeds> specialNeeds;
     private String school;
 
 
