@@ -17,15 +17,13 @@ public class Student {
     private String DNI;
     private String name;
     private String surnames;
-    @OneToOne(fetch = FetchType.LAZY)
-    private Enrolment enrolment;
+    @OneToMany
+    private List<Enrolment> enrolment;
     private String email;
     private String phoneNumber;
     @ManyToMany
     private List<SpecialNeeds> specialNeeds;
     private String examsId;
     private String school;
-
-
 
 }
