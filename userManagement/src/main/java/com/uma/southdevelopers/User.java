@@ -4,6 +4,7 @@ package com.uma.southdevelopers;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.persistence.*;
 
@@ -19,10 +20,17 @@ public class User {
 
     @Id @GeneratedValue
     private Long userId;
+
     private String email;
+
+    @NonNull
     private String name;
+
     private String surname;
+
+    @NonNull
     private String password;
+
     @Enumerated(EnumType.STRING)
     private Rol rol;
 
