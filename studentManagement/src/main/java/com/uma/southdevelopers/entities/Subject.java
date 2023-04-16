@@ -1,4 +1,4 @@
-package com.uma.southdevelopers;
+package com.uma.southdevelopers.entities;
 
 public enum Subject {
     LENGUA_CASTELLANA_Y_LITERATURA,

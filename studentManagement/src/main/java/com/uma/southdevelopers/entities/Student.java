@@ -1,5 +1,7 @@
-package com.uma.southdevelopers;
+package com.uma.southdevelopers.entities;
 
+import com.uma.southdevelopers.entities.Enrolment;
+import com.uma.southdevelopers.entities.SpecialNeeds;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
