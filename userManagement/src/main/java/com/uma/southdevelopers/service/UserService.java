@@ -4,11 +4,13 @@ import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.repositories.UserRepository;
 import com.uma.southdevelopers.service.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserService {
     private UserRepository userRepository;
 
@@ -38,8 +40,9 @@ public class UserService {
             existingUser.setPassword(user.getPassword());
             existingUser.setRol(user.getRol());
             return userRepository.save(existingUser);
+        } else {
+            throw new UserNotFoundException();
         }
-        return null;
     }
 
     public void deleteUser(Long userId) {
