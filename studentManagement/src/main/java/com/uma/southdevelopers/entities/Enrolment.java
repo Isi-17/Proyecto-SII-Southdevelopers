@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
-import java.util.Date;
 
 @Entity
 @Data
@@ -15,11 +14,9 @@ public class Enrolment {
 
     @Id @GeneratedValue
     private Long id;
-    @Temporal(TemporalType.DATE)
-    private Date date;
-    @ManyToOne(fetch = FetchType.LAZY)
+    private String name;
+    private Boolean deleted;
+    @ManyToOne
     private Student student;
-    @Enumerated(EnumType.STRING)
-    private Subject subject;
 
 }

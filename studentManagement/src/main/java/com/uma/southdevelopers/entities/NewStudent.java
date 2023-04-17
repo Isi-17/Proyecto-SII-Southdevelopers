@@ -1,6 +1,7 @@
 package com.uma.southdevelopers.entities;
 
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-public class Student {
+public class NewStudent {
+
     @Id @GeneratedValue
     private Long Id;
     @OneToOne
@@ -22,9 +24,7 @@ public class Student {
     private String email;
     @OneToMany
     private List<Enrolment> subjects;
+    private Long idInstitute;
     private Long idCampus;
-    @OneToOne
-    private Institute institute;
     private boolean noDelete;
-
 }

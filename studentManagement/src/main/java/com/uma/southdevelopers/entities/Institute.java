@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class Institute {
-    @Id
+    @Id @GeneratedValue
     private Long id;
     private String name;
     private String address1;
