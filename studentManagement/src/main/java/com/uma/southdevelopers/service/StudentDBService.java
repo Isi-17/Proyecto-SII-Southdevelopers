@@ -25,7 +25,7 @@ public class StudentDBService {
     public List<String> allStudents() {
         return studentRepository.findAll()
                 .stream()
-                .map(Student::getDNI)
+                .map(Student::getDni)
                 .toList();
     }
 
