@@ -1,4 +1,4 @@
-package com.uma.southdevelopers;
+package com.uma.southdevelopers.entities;
 
 
 import lombok.AllArgsConstructor;

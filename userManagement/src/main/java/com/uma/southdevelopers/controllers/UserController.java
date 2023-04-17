@@ -1,5 +1,7 @@
-package com.uma.southdevelopers;
+package com.uma.southdevelopers.controllers;
 
+import com.uma.southdevelopers.entities.User;
+import com.uma.southdevelopers.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

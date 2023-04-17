@@ -1,5 +1,7 @@
-package com.uma.southdevelopers;
+package com.uma.southdevelopers.service;
 
+import com.uma.southdevelopers.entities.User;
+import com.uma.southdevelopers.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
