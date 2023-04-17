@@ -2,6 +2,7 @@ package com.uma.southdevelopers.service;
 
 import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.repositories.UserRepository;
+import com.uma.southdevelopers.service.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -41,12 +42,11 @@ public class UserService {
         return null;
     }
 
-    public boolean deleteUser(Long userId) {
-        try {
+    public void deleteUser(Long userId) {
+        if(userRepository.existsById(userId)) {
             userRepository.deleteById(userId);
-            return true;
-        } catch (Exception e) {
-            return false;
+        }else{
+            throw new UserNotFoundException();
         }
     }    
 }
