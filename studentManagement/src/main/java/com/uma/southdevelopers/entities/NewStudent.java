@@ -16,7 +16,7 @@ import java.util.List;
 public class NewStudent {
 
     @Id @GeneratedValue
-    private Long Id;
+    private Long id;
     @OneToOne
     private CompleteName nombreCompleto;
     private String dni;
@@ -27,4 +27,23 @@ public class NewStudent {
     private Long idInstituto;
     private Long idSede;
     private boolean noEliminar;
+
+    public Student student() {
+        var stud = new Student();
+
+        stud.setId(id);
+        stud.setNombre(nombreCompleto.getNombre());
+        stud.setApellido1(nombreCompleto.getApellido1());
+        stud.setApellido2(nombreCompleto.getApellido2());
+        stud.setDni(dni);
+        stud.setTelefono(telefono);
+        stud.setEmail(email);
+        stud.setMateriasMatriculadas(materiasMatriculadas);
+        stud.setIdSede(idSede);
+        stud.setInstituto(null);
+        stud.setNoEliminar(noEliminar);
+
+        return stud;
+
+    }
 }

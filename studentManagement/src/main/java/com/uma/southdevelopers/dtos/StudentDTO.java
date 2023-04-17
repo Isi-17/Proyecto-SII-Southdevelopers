@@ -18,8 +18,8 @@ import java.util.function.Function;
 @Builder
 public class StudentDTO {
 
-    private Long id;
     private CompleteName nombre;
+    private Long id;
     private String dni;
     private String telefono;
     private String email;
@@ -35,7 +35,8 @@ public class StudentDTO {
         var dto = new StudentDTO();
 
         dto.setId(student.getId());
-        dto.setNombre(student.getNombre());
+        CompleteName completeName = new CompleteName(student.getNombre(), student.getApellido1(), student.getApellido2());
+        dto.setNombre(completeName);
         dto.setDni(student.getDni());
         dto.setTelefono(student.getTelefono());
         dto.setEmail(student.getEmail());
@@ -54,7 +55,9 @@ public class StudentDTO {
         var stud = new Student();
 
         stud.setId(id);
-        stud.setNombre(nombre);
+        stud.setNombre(nombre.getNombre());
+        stud.setApellido1(nombre.getApellido1());
+        stud.setApellido2(nombre.getApellido2());
         stud.setDni(dni);
         stud.setTelefono(telefono);
         stud.setEmail(email);
