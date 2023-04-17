@@ -33,20 +33,23 @@ public class InstituteController {
     }
 
     @GetMapping
-    public List<Institute> obtainInstitutes() {
-        return service.allInstitutes()
-                .stream()
+    public List<InstituteDTO> obtainInstitutes(UriComponentsBuilder uriBuilder) {
+        var institutes = service.allInstitutes();
+        Function<Institute, InstituteDTO> mapper = (p ->
+                InstituteDTO.fromInstitute(p,
+                        instituteUriBuilder(uriBuilder.build())));
+        return institutes.stream()
+                .map(mapper)
                 .toList();
     }
 
     @PostMapping
-    public ResponseEntity<?> addInstitute(@RequestBody Institute institute, UriComponentsBuilder builder) {
-        Long id = service.addInstitute(institute);
-        URI uri = builder.path("/institutos")
-                .path(String.format("/%d", id))
-                .build()
-                .toUri();
-        return ResponseEntity.created(uri).build();
+    public ResponseEntity<?> addInstitute(@RequestBody InstituteDTO institute, UriComponentsBuilder uriBuilder) {
+        Institute inst = institute.institute();
+        Long id = service.addInstitute(inst);
+        return ResponseEntity.created(
+                        instituteUriBuilder(uriBuilder.build()).apply(id))
+                .build();
     }
 
     @GetMapping("/{id}")
@@ -59,8 +62,15 @@ public class InstituteController {
 
     @PutMapping("/{id}")
     @ResponseStatus(code=HttpStatus.OK)
-    public void updateInstitute(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
-        Institute institute = service.obtainInstitute(id);
+    public void updateInstitute(@PathVariable Long id, @RequestBody InstituteDTO institute) {
+        Institute entidadInstituto = institute.institute();
+        entidadInstituto.setId(id);
+        service.updateInstitute(entidadInstituto);
+    }
+
+    @DeleteMapping("{id}")
+    public void deleteInstitute(@PathVariable Long id) {
+        service.deleteInstitute(id);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
