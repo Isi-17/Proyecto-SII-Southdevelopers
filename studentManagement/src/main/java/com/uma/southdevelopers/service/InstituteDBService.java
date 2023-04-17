@@ -42,7 +42,19 @@ public class InstituteDBService {
         }
     }
 
-    public void updateInstitute() {
+    public void updateInstitute(Institute institute) {
+        if (instituteRepository.existsById(institute.getId())) {
+            instituteRepository.save(institute);
+        } else {
+            throw new EntityNotFoundException();
+        }
+    }
 
+    public void deleteInstitute(Long id) {
+        if (instituteRepository.existsById(id)) {
+            instituteRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException();
+        }
     }
 }
