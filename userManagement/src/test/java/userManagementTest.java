@@ -23,6 +23,5 @@ import org.springframework.web.util.UriBuilderFactory;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-class userManagementTest {
-
+public class userManagementTest {
 }
