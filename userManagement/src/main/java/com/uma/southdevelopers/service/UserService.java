@@ -3,6 +3,8 @@ package com.uma.southdevelopers.service;
 import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.repositories.UserRepository;
 import com.uma.southdevelopers.service.exceptions.UserNotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,8 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
+    public Optional<User> getUserByEmail(String email){ return  userRepository.findByEmail(email);}
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -42,6 +46,17 @@ public class UserService {
             return userRepository.save(existingUser);
         } else {
             throw new UserNotFoundException();
+        }
+    }
+
+    public User resetPassword(String email){
+        Optional<User> maybeUser = userRepository.findByEmail(email);
+        if(!maybeUser.isPresent()){
+           throw new UserNotFoundException();
+        }else{
+            User user = maybeUser.get();
+            user.setPassword("nuevaAleatoria");
+            return userRepository.save(user);
         }
     }
 

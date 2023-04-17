@@ -39,6 +39,16 @@ public class UserController {
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
+    @PostMapping("/passwordreset")
+    public ResponseEntity<User> resetPassword(@RequestBody String email){
+        User user = userService.resetPassword(email);
+        if(user == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }else{
+            return  new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         User updatedUser = userService.updateUser(id, user);
