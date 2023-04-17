@@ -5,6 +5,7 @@ import com.uma.southdevelopers.controllers.InstituteController;
 import com.uma.southdevelopers.entities.Institute;
 import com.uma.southdevelopers.entities.Student;
 import com.uma.southdevelopers.repositories.InstituteRepository;
+import com.uma.southdevelopers.service.exceptions.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,12 @@ public class InstituteDBService {
         var institute = instituteRepository.findById(id);
         if (institute.isPresent()) {
             return institute.get();
+        } else {
+            throw new EntityNotFoundException();
         }
-        return null;
+    }
+
+    public void updateInstitute() {
+
     }
 }
