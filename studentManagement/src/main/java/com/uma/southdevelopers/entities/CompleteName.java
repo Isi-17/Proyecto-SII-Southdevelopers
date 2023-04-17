@@ -9,7 +9,7 @@ public class CompleteName {
 
     @Id
     private Long id;
-    private String surname1;
-    private String surname2;
-    private String name;
+    private String apellido1;
+    private String apellido2;
+    private String nombre;
 }

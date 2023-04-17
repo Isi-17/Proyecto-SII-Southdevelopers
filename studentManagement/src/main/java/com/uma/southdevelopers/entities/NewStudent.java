@@ -18,13 +18,13 @@ public class NewStudent {
     @Id @GeneratedValue
     private Long Id;
     @OneToOne
-    private CompleteName name;
-    private String DNI;
-    private String phone;
+    private CompleteName nombreCompleto;
+    private String dni;
+    private String telefono;
     private String email;
     @OneToMany
-    private List<Enrolment> subjects;
-    private Long idInstitute;
-    private Long idCampus;
-    private boolean noDelete;
+    private List<Enrolment> materiasMatriculadas;
+    private Long idInstituto;
+    private Long idSede;
+    private boolean noEliminar;
 }

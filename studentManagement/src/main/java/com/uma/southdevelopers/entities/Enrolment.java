@@ -14,9 +14,9 @@ public class Enrolment {
 
     @Id @GeneratedValue
     private Long id;
-    private String name;
-    private Boolean deleted;
+    private String nombre;
+    private Boolean eliminada;
     @ManyToOne
-    private Student student;
+    private Student estudiante;
 
 }

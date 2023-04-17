@@ -16,15 +16,15 @@ public class Student {
     @Id @GeneratedValue
     private Long Id;
     @OneToOne
-    private CompleteName name;
-    private String DNI;
-    private String phone;
+    private CompleteName nombre;
+    private String dni;
+    private String telefono;
     private String email;
     @OneToMany
-    private List<Enrolment> subjects;
-    private Long idCampus;
+    private List<Enrolment> materiasMatriculadas;
+    private Long idSede;
     @OneToOne
-    private Institute institute;
-    private boolean noDelete;
+    private Institute instituto;
+    private boolean noEliminar;
 
 }

@@ -32,4 +32,11 @@ public class InstituteDBService {
         return institute.getId();
     }
 
+    public Institute obtainInstitute(Long id) {
+        var institute = instituteRepository.findById(id);
+        if (institute.isPresent()) {
+            return institute.get();
+        }
+        return null;
+    }
 }

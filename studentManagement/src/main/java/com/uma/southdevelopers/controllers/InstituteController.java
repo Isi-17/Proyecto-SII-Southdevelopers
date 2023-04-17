@@ -21,7 +21,9 @@ public class InstituteController {
 
     @GetMapping
     public List<Institute> obtainInstitutes() {
-        return service.allInstitutes().stream().toList();
+        return service.allInstitutes()
+                .stream()
+                .toList();
     }
 
     @PostMapping
@@ -33,5 +35,12 @@ public class InstituteController {
                 .toUri();
         return ResponseEntity.created(uri).build();
     }
+
+    @GetMapping("/{id}")
+    public Institute obtainInstitute(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
+        Institute institute = service.obtainInstitute(id);
+        return institute;
+    }
+
 
 }

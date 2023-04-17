@@ -15,10 +15,10 @@ import java.util.List;
 public class Institute {
     @Id @GeneratedValue
     private Long id;
-    private String name;
-    private String address1;
-    private String address2;
-    private String city;
-    private Integer zipcode;
-    private String country;
+    private String nombre;
+    private String direccion1;
+    private String direccion2;
+    private String localidad;
+    private Integer codigoPostal;
+    private String pais;
 }
