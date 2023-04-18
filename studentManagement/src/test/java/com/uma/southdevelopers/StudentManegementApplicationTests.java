@@ -390,6 +390,64 @@ public class StudentManegementApplicationTests {
             assertThat(respuestaPut.getStatusCode().value()).isEqualTo(404);
         }
 
+        @Test
+        @DisplayName("estudiante ya existente")
+        public void estudianteExistente(){
+
+            CompleteName cn = new CompleteName();
+            cn.setNombre("Jesus");
+            cn.setApellido1("Escudero");
+            cn.setApellido2("Moreno");
+
+            var estudiante1 = StudentDTO.builder()
+                    .nombre(cn)
+                    .id(1L)
+                    .build();
+
+            var peticionPost = post("http", "localhost", port, "/localhost", estudiante1);
+
+            var respuestaPost1 = restTemplate.exchange(peticionPost, Void.class);
+
+            var estudiante2 = StudentDTO.builder()
+                    .nombre(cn)
+                    .id(1L)
+                    .build();
+
+            var peticionPost2 = post("http", "localhost", port, "/localhost", estudiante2);
+
+            var respuestaPost2 = restTemplate.exchange(peticionPost, Void.class);
+
+            List<Student> estudiantesBD = studentRepo.findAll();
+
+            assertThat(estudiantesBD).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("instituto ya existente")
+        public void institutoExistente(){
+
+            var instituto1 = InstituteDTO.builder()
+                    .nombre("Puertosol")
+                    .id(1L)
+                    .build();
+
+            var peticionPost = post("http", "localhost", port, "/localhost", instituto1);
+
+            var respuestaPost1 = restTemplate.exchange(peticionPost, Void.class);
+
+            var instituto2 = InstituteDTO.builder()
+                    .nombre("Puertosol")
+                    .id(1L)
+                    .build();
+
+            var peticionPost2 = post("http", "localhost", port, "/localhost", instituto2);
+
+            var respuestaPost2 = restTemplate.exchange(peticionPost, Void.class);
+
+            List<Institute> institutosBD = instituteRepo.findAll();
+
+            assertThat(institutosBD).hasSize(1);
+        }
 
     }
 }
