@@ -68,7 +68,7 @@ public class InstituteController {
         service.updateInstitute(entidadInstituto);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public void deleteInstitute(@PathVariable Long id) {
         service.deleteInstitute(id);
     }

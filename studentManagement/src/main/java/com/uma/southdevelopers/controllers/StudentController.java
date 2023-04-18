@@ -1,13 +1,17 @@
 package com.uma.southdevelopers.controllers;
 
 
+import com.uma.southdevelopers.dtos.InstituteDTO;
 import com.uma.southdevelopers.dtos.StudentDTO;
 
 import com.uma.southdevelopers.entities.Institute;
-import com.uma.southdevelopers.entities.NewStudent;
 import com.uma.southdevelopers.entities.Student;
 import com.uma.southdevelopers.service.InstituteDBService;
 import com.uma.southdevelopers.service.StudentDBService;
+import com.uma.southdevelopers.service.exceptions.EntityDoNotDeleteException;
+import com.uma.southdevelopers.service.exceptions.EntityNotFoundException;
+import com.uma.southdevelopers.service.exceptions.ExistingEntityDniException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponents;
@@ -48,16 +52,48 @@ public class StudentController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addStudent(@RequestBody NewStudent student, UriComponentsBuilder uriBuilder) {
-        System.out.println(student);
-        System.out.println("HOLA");
-        Student stud = student.student();
-        System.out.println(student.getIdInstituto());
-        System.out.println(serviceInstitute.obtainInstitute(student.getIdInstituto()));
-        stud.setInstituto(serviceInstitute.obtainInstitute(student.getIdInstituto()));
+    public ResponseEntity<?> addStudent(@RequestBody StudentDTO student, UriComponentsBuilder uriBuilder) {
+        Institute institute = serviceInstitute.obtainInstitute(student.getIdInstituto());
+
+        Student stud = student.student(institute);
+
         Long id = service.addStudent(stud);
-        System.out.println("ID: " + id);
+
         return ResponseEntity.created(studentUriBuilder(uriBuilder.build()).apply(id))
                 .build();
     }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(code=HttpStatus.OK)
+    public StudentDTO obtainStudent(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
+        Student student = service.obtainStudent(id);
+        return StudentDTO.fromStudent(student,
+                studentUriBuilder(uriBuilder.build()));
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(code=HttpStatus.OK)
+    public void updateStudent(@PathVariable Long id, @RequestBody StudentDTO student) {
+        Institute institute = serviceInstitute.obtainInstitute(student.getIdInstituto());
+        Student entidadStudent = student.student(institute);
+        entidadStudent.setId(id);
+        service.updateStudent(entidadStudent);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteStudent(@PathVariable Long id) {
+        service.deleteStudent(id);
+    }
+
+    @ExceptionHandler(ExistingEntityDniException.class)
+    @ResponseStatus(code = HttpStatus.CONFLICT)
+    public void existingDni() {}
+
+    @ExceptionHandler(EntityDoNotDeleteException.class)
+    @ResponseStatus(code = HttpStatus.CONFLICT)
+    public void doNotDelete() {}
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    public void notFound() {}
 }

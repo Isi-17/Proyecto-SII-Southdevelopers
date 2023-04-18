@@ -1,7 +1,6 @@
 package com.uma.southdevelopers.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.uma.southdevelopers.entities.CompleteName;
 import com.uma.southdevelopers.entities.Enrolment;
 import com.uma.southdevelopers.entities.Institute;
 import com.uma.southdevelopers.entities.Student;
@@ -18,14 +17,14 @@ import java.util.function.Function;
 @Builder
 public class StudentDTO {
 
-    private CompleteName nombre;
+    private CompleteNameDTO nombreCompleto;
     private Long id;
     private String dni;
     private String telefono;
     private String email;
     private List<Enrolment> materiasMatriculadas;
     private Long idSede;
-    private Institute instituto;
+    private Long idInstituto;
     private boolean noEliminar;
     @JsonProperty("_links")
     private Links links;
@@ -35,14 +34,14 @@ public class StudentDTO {
         var dto = new StudentDTO();
 
         dto.setId(student.getId());
-        CompleteName completeName = new CompleteName(student.getNombre(), student.getApellido1(), student.getApellido2());
-        dto.setNombre(completeName);
+        CompleteNameDTO completeNameDTO = new CompleteNameDTO(student.getNombre(), student.getApellido1(), student.getApellido2());
+        dto.setNombreCompleto(completeNameDTO);
         dto.setDni(student.getDni());
         dto.setTelefono(student.getTelefono());
         dto.setEmail(student.getEmail());
         dto.setMateriasMatriculadas(student.getMateriasMatriculadas());
         dto.setIdSede(student.getIdSede());
-        dto.setInstituto(student.getInstituto());
+        dto.setIdInstituto(student.getInstituto().getId());
         dto.setNoEliminar(student.isNoEliminar());
         dto.setLinks(Links.builder()
                 .self(studentUriBuilder.apply(student.getId()))
@@ -51,19 +50,19 @@ public class StudentDTO {
         return dto;
     }
 
-    public Student student() {
+    public Student student(Institute institute) {
         var stud = new Student();
 
         stud.setId(id);
-        stud.setNombre(nombre.getNombre());
-        stud.setApellido1(nombre.getApellido1());
-        stud.setApellido2(nombre.getApellido2());
+        stud.setNombre(nombreCompleto.getNombre());
+        stud.setApellido1(nombreCompleto.getApellido1());
+        stud.setApellido2(nombreCompleto.getApellido2());
         stud.setDni(dni);
         stud.setTelefono(telefono);
         stud.setEmail(email);
         stud.setMateriasMatriculadas(materiasMatriculadas);
         stud.setIdSede(idSede);
-        stud.setInstituto(instituto);
+        stud.setInstituto(institute);
         stud.setNoEliminar(noEliminar);
 
         return stud;

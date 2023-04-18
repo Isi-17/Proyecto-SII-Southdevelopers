@@ -21,7 +21,7 @@ public class Student {
     private String dni;
     private String telefono;
     private String email;
-    @OneToMany
+    @ManyToMany
     private List<Enrolment> materiasMatriculadas;
     private Long idSede;
     @OneToOne

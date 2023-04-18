@@ -2,14 +2,12 @@ package com.uma.southdevelopers;
 
 import com.uma.southdevelopers.dtos.InstituteDTO;
 import com.uma.southdevelopers.dtos.StudentDTO;
-import com.uma.southdevelopers.entities.CompleteName;
+import com.uma.southdevelopers.dtos.CompleteNameDTO;
 import org.junit.jupiter.api.Nested;
 import org.springframework.core.ParameterizedTypeReference;
 import org.testng.annotations.Test;
-import com.uma.southdevelopers.entities.Enrolment;
 import com.uma.southdevelopers.entities.Institute;
 import com.uma.southdevelopers.entities.Student;
-import com.uma.southdevelopers.repositories.EnrolmentRepository;
 import com.uma.southdevelopers.repositories.InstituteRepository;
 import com.uma.southdevelopers.repositories.StudentRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -157,7 +155,7 @@ public class StudentManegementApplicationTests {
         @DisplayName("inserta correctamente un estudiante")
         public void insertaEstudiante(){
 
-            CompleteName cn = new CompleteName();
+            CompleteNameDTO cn = new CompleteNameDTO();
             cn.setNombre("Jesus");
             cn.setApellido1("Escudero");
             cn.setApellido2("Moreno");
