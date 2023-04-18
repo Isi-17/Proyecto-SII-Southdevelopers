@@ -16,7 +16,5 @@ public class Enrolment {
     private Long id;
     private String nombre;
     private Boolean eliminada;
-    @ManyToOne
-    private Student estudiante;
 
 }

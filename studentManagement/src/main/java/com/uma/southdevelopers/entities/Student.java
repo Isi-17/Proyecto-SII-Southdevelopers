@@ -15,8 +15,9 @@ import java.util.List;
 public class Student {
     @Id @GeneratedValue
     private Long Id;
-    @OneToOne
-    private CompleteName nombre;
+    private String nombre;
+    private String apellido1;
+    private String apellido2;
     private String dni;
     private String telefono;
     private String email;
