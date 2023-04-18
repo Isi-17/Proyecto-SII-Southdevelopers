@@ -1,6 +1,7 @@
 package com.uma.southdevelopers.controllers;
 
 
+import com.opencsv.CSVReader;
 import com.uma.southdevelopers.dtos.InstituteDTO;
 import com.uma.southdevelopers.dtos.StudentDTO;
 
@@ -11,13 +12,20 @@ import com.uma.southdevelopers.service.StudentDBService;
 import com.uma.southdevelopers.service.exceptions.EntityDoNotDeleteException;
 import com.uma.southdevelopers.service.exceptions.EntityNotFoundException;
 import com.uma.southdevelopers.service.exceptions.ExistingEntityDniException;
+import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.File;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -83,6 +91,33 @@ public class StudentController {
     @DeleteMapping("/{id}")
     public void deleteStudent(@PathVariable Long id) {
         service.deleteStudent(id);
+    }
+
+    @PostMapping("/upload")
+    public void uploadCSV(@RequestParam("ficheroEstudiantes") MultipartFile csvFile) throws Exception {
+
+        File file = new File();
+        Files.write(file.toPath(), csvFile.getBytes());
+
+        Reader reader = new InputStreamReader(csvFile.getInputStream());
+        CSVReader csvReader = new CSVReader(reader);
+
+        String[] nextRecord;
+        List<Student> students = new ArrayList<>();
+
+        while ((nextRecord = csvReader.readNext()) != null) {
+            Student student = new Student();
+            student.setDni(nextRecord[0]);
+            System.out.println(nextRecord[0]);
+            //student.setName(nextRecord[1]);
+            //student.setSurname(nextRecord[2]);
+            //student.setAge(Integer.parseInt(nextRecord[3]));
+            //student.setInstitute(serviceInstitute.obtainInstitute(Long.parseLong(nextRecord[4])));
+            //students.add(student);
+        }
+
+        //service.addStudents(students);
+
     }
 
     @ExceptionHandler(ExistingEntityDniException.class)
