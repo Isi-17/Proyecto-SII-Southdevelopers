@@ -180,15 +180,99 @@ public class StudentManegementApplicationTests {
 
             List<Student> estudiantesBD = studentRepo.findAll();
             assertThat(estudiantesBD).hasSize(1);
-
-
-
+            assertThat(respuesta.getHeaders().get("Location").get(0))
+                    .endsWith("/" + estudiantesBD.get(0).getId());
+            checkFields(estudiante.student(), estudiantesBD.get(0));
         }
 
+        @Test
+        @DisplayName("inserta correctamente un instituto")
+        public void insertaInstituto(){
 
 
+            // Preparamos el ingrediente a insertar
+            var instituto = InstituteDTO.builder()
+                    .nombre("Puertosol")
+                    .build();
 
+            // Preparamos la peticion con el estudiante dentro
+            var peticion = post("http", "localhost", port, "/localhost", instituto);
 
+            // Invocamos al servicio REST
+            var respuesta = restTemplate.exchange(peticion, Void.class);
+
+            // Comprobamos el resultado
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
+            assertThat(respuesta.getHeaders().get("Location").get(0))
+                    .startsWith("http://localhost:" + port + "/Localhost");
+
+            List<Institute> institutosBD = instituteRepo.findAll();
+            assertThat(institutosBD).hasSize(1);
+            assertThat(respuesta.getHeaders().get("Location").get(0))
+                    .endsWith("/" + institutosBD.get(0).getId());
+            checkFields(instituto.institute(), institutosBD.get(0));
+        }
+
+        @Test
+        @DisplayName("elimina correctamente un estudiante")
+        public void eliminaEstudiante(){
+
+            CompleteName cn = new CompleteName();
+            cn.setNombre("Jesus");
+            cn.setApellido1("Escudero");
+            cn.setApellido2("Moreno");
+
+            var estudiante = StudentDTO.builder()
+                    .nombre(cn)
+                    .id(1L)
+                    .build();
+
+            var peticionPost = post("http", "localhost", port, "/localhost", estudiante);
+
+            var respuestaPost = restTemplate.exchange(peticionPost, Void.class);
+
+            var peticionDelete = delete("http", "localhost", port, "/localhost/"+estudiante.getId());
+
+            var respuestaDelete = restTemplate.exchange(peticionDelete, Void.class);
+            assertThat(respuestaDelete.getStatusCode().value()).isEqualTo(200);
+
+            var peticionDelete1 = delete("http","localhost", port, "/localhost/"+33L);
+
+            var respuestaDelete1 = restTemplate.exchange(peticionDelete1, Void.class);
+            assertThat(respuestaDelete1.getStatusCode().value()).isEqualTo(404);
+
+            List<Student> estudiantesBD = studentRepo.findAll();
+
+            assertThat(estudiantesBD).hasSize(0);
+        }
+
+        @Test
+        @DisplayName("elimina correctamente un instituto")
+        public void eliminaInstituto(){
+
+            var instituto = InstituteDTO.builder()
+                    .nombre("Puertosol")
+                    .id(1L)
+                    .build();
+
+            var peticionPost = post("http", "localhost", port, "/localhost", instituto);
+
+            var respuestaPost = restTemplate.exchange(peticionPost, Void.class);
+
+            var peticionDelete = delete("http", "localhost", port, "/localhost/"+instituto.getId());
+
+            var respuestaDelete = restTemplate.exchange(peticionDelete, Void.class);
+            assertThat(respuestaDelete.getStatusCode().value()).isEqualTo(200);
+
+            var peticionDelete1 = delete("http","localhost", port, "/localhost/"+33L);
+
+            var respuestaDelete1 = restTemplate.exchange(peticionDelete1, Void.class);
+            assertThat(respuestaDelete1.getStatusCode().value()).isEqualTo(404);
+
+            List<Institute> institutosBD = instituteRepo.findAll();
+
+            assertThat(institutosBD).hasSize(0);
+        }
 
     }
 }
