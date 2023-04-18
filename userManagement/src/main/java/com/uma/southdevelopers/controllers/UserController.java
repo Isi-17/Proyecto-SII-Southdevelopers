@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/usuarios")
 
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/")
+    @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
@@ -45,6 +45,7 @@ public class UserController {
         if(user == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }else{
+
             return  new ResponseEntity<>(HttpStatus.OK);
         }
     }
