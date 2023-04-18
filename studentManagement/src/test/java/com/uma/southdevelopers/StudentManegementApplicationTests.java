@@ -336,8 +336,59 @@ public class StudentManegementApplicationTests {
             checkFields(instituto.institute(), institutosBD.get(0));
         }
 
+        @Test
+        @DisplayName("modifica incorrectamente un estudiante")
+        public void modificaEstudiante2(){
 
+            CompleteName cn = new CompleteName();
+            cn.setNombre("Jesus");
+            cn.setApellido1("Escudero");
+            cn.setApellido2("Moreno");
 
+            var estudiante = StudentDTO.builder()
+                    .nombre(cn)
+                    .id(1L)
+                    .build();
+
+            var peticionPost = post("http", "localhost", port, "/localhost", estudiante);
+
+            var respuestaPost = restTemplate.exchange(peticionPost, Void.class);
+
+            CompleteName cn1 = new CompleteName();
+            cn.setNombre("Alvaro");
+            cn.setApellido1("Sanchez");
+            cn.setApellido2("Hernandez");
+
+            estudiante.setNombre(cn1);
+
+            var peticionPut = put("http", "localhost", port, "/localhost/"+33L, estudiante);
+
+            var respuestaPut = restTemplate.exchange(peticionPut, Void.class);
+
+            assertThat(respuestaPut.getStatusCode().value()).isEqualTo(404);
+        }
+
+        @Test
+        @DisplayName("modifica incorrectamente un instituto")
+        public void modificaInstituto2(){
+
+            var instituto = InstituteDTO.builder()
+                    .nombre("Puertosol")
+                    .id(1L)
+                    .build();
+
+            var peticionPost = post("http", "localhost", port, "/localhost", instituto);
+
+            var respuestaPost = restTemplate.exchange(peticionPost, Void.class);
+
+            instituto.setNombre("Olivos");
+
+            var peticionPut = put("http", "localhost", port, "/localhost/"+33L, instituto);
+
+            var respuestaPut = restTemplate.exchange(peticionPut, Void.class);
+
+            assertThat(respuestaPut.getStatusCode().value()).isEqualTo(404);
+        }
 
 
     }
