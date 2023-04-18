@@ -502,6 +502,59 @@ public class StudentManegementApplicationTests {
             assertThat(institutosBD.get(0).getNombre()).isEqualTo(instituto.getNombre());
         }
 
+        @Test
+        @DisplayName("obtiene correctamente todos los estudiantes")
+        public void obtieneTodosLosEstudiantes(){
+
+            CompleteName cn = new CompleteName();
+            cn.setNombre("Jesus");
+            cn.setApellido1("Escudero");
+            cn.setApellido2("Moreno");
+
+            var estudiante1 = StudentDTO.builder()
+                    .nombre(cn)
+                    .id(1L)
+                    .build();
+
+            var peticionPost1 = post("http", "localhost",port, "/localhost", estudiante1);
+
+            var respuestaPost1 = restTemplate.exchange(peticionPost1, Void.class);
+
+            var peticionGet = get("http", "localhost", port, "/localhost");
+
+            var respuestaGet = restTemplate.exchange(peticionGet, Void.class);
+
+            assertThat(respuestaGet.getStatusCode().value()).isEqualTo(200);
+
+            List<Student> estudiantesBD = studentRepo.findAll();
+
+            assertThat(estudiantesBD).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("obtiene correctamente todos los institutos")
+        public void obtieneTodosLosInstitutos(){
+
+            var instituto1 = StudentDTO.builder()
+                    .nombre("Puertosol")
+                    .id(1L)
+                    .build();
+
+            var peticionPost1 = post("http", "localhost",port, "/localhost", instituto1);
+
+            var respuestaPost1 = restTemplate.exchange(peticionPost1, Void.class);
+
+            var peticionGet = get("http", "localhost", port, "/localhost");
+
+            var respuestaGet = restTemplate.exchange(peticionGet, Void.class);
+
+            assertThat(respuestaGet.getStatusCode().value()).isEqualTo(200);
+
+            List<Institute> institutosBD = instituteRepo.findAll();
+
+            assertThat(institutosBD).hasSize(1);
+        }
+
 
 
     }
