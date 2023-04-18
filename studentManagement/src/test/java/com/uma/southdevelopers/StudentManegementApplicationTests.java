@@ -535,7 +535,7 @@ public class StudentManegementApplicationTests {
         @DisplayName("obtiene correctamente todos los institutos")
         public void obtieneTodosLosInstitutos(){
 
-            var instituto1 = StudentDTO.builder()
+            var instituto1 = InstituteDTO.builder()
                     .nombre("Puertosol")
                     .id(1L)
                     .build();
@@ -554,7 +554,6 @@ public class StudentManegementApplicationTests {
 
             assertThat(institutosBD).hasSize(1);
         }
-
 
 
     }
