@@ -1,5 +1,6 @@
 package com.uma.southdevelopers.controllers;
 
+import com.uma.southdevelopers.dto.PasswordresetDTO;
 import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,12 +43,12 @@ public class UserController {
     }
 
     @PostMapping("/passwordreset")
-    public ResponseEntity<User> resetPassword(@RequestBody String email){
-        User user = userService.resetPassword(email);
+    public ResponseEntity<User> resetPassword(@RequestBody PasswordresetDTO pssDTO){
+        User user = userService.resetPassword(pssDTO.getEmail());
         if(user == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }else{
-
+            //Hay que hacer post para mandar la notificacion al correo ------------------------------
             return  new ResponseEntity<>(HttpStatus.OK);
         }
     }
