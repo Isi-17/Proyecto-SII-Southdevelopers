@@ -2,8 +2,13 @@ package com.uma.southdevelopers.controllers;
 
 import com.uma.southdevelopers.dto.NotificationDTO;
 import com.uma.southdevelopers.dto.PasswordresetDTO;
+import com.uma.southdevelopers.dto.LoginDTO;
+import com.uma.southdevelopers.dto.RespuestaTokenDTO;
 import com.uma.southdevelopers.entities.User;
+import com.uma.southdevelopers.service.JwtService;
 import com.uma.southdevelopers.service.UserService;
+import com.uma.southdevelopers.service.exceptions.UserNotFoundException;
+import com.uma.southdevelopers.service.exceptions.WrongCredentialsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -27,6 +32,8 @@ import java.util.Optional;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private JwtService jwtService;
 
     @Value(value="${local.server.port}")
     private int port;
@@ -97,6 +104,14 @@ public class UserController {
         userService.deleteUser(id);
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<RespuestaTokenDTO> deleteUser(@RequestBody LoginDTO login) {
+        if(!userService.existUserByEmail(login.getEmail()) || !userService.correctPassword(login.getEmail(), login.getPassword())){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        RespuestaTokenDTO respuesta = new RespuestaTokenDTO(jwtService.createToken(login.getEmail()));
+        return new ResponseEntity<>(respuesta, HttpStatus.OK);
+    }
 }
 
 
