@@ -25,6 +25,7 @@ import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@DisplayName("Tests de userManagement")
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class userManagementTest {
 
@@ -84,7 +85,7 @@ public class userManagementTest {
         @Test
         @DisplayName("devuelve una lista vacía de usuarios")
         public void devuelveListaVaciaProductos() {
-            var peticion = get("http", "localhost",port, "");
+            var peticion = get("http", "localhost",port, "/usuarios");
 
             var respuesta = restTemplate.exchange(peticion,
                     new ParameterizedTypeReference<List<User>>() {});
