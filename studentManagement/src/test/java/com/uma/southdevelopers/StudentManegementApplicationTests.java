@@ -160,6 +160,9 @@ public class StudentManegementApplicationTests {
             cn.setApellido1("Escudero");
             cn.setApellido2("Moreno");
 
+            Institute ins = new Institute();
+            ins.setId(1L);
+
             // Preparamos el ingrediente a insertar
             var estudiante = StudentDTO.builder()
                     .nombreCompleto(cn)
@@ -180,7 +183,7 @@ public class StudentManegementApplicationTests {
             assertThat(estudiantesBD).hasSize(1);
             assertThat(respuesta.getHeaders().get("Location").get(0))
                     .endsWith("/" + estudiantesBD.get(0).getId());
-            //checkFields(estudiante.student(), estudiantesBD.get(0));
+            checkFields(estudiante.student(ins), estudiantesBD.get(0));
         }
 
         @Test
@@ -281,6 +284,9 @@ public class StudentManegementApplicationTests {
             cn.setApellido1("Escudero");
             cn.setApellido2("Moreno");
 
+            Institute ins = new Institute();
+            ins.setId(1L);
+
             var estudiante = StudentDTO.builder()
                     .nombreCompleto(cn)
                     .id(1L)
@@ -305,7 +311,7 @@ public class StudentManegementApplicationTests {
 
             List<Student> estudiantesBD = studentRepo.findAll();
 
-            //checkFields(estudiante.student(), estudiantesBD.get(0));
+            checkFields(estudiante.student(ins), estudiantesBD.get(0));
         }
 
         @Test
