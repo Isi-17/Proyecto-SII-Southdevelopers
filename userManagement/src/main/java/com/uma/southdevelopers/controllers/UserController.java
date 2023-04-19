@@ -1,14 +1,22 @@
 package com.uma.southdevelopers.controllers;
 
+import com.uma.southdevelopers.dto.NotificationDTO;
 import com.uma.southdevelopers.dto.PasswordresetDTO;
 import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriBuilderFactory;
 
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +27,27 @@ import java.util.Optional;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Value(value="${local.server.port}")
+    private int port;
+
+    private URI uri(String scheme, String host, int port, String ...paths) {
+        UriBuilderFactory ubf = new DefaultUriBuilderFactory();
+        UriBuilder ub = ubf.builder()
+                .scheme(scheme)
+                .host(host).port(port);
+        for (String path: paths) {
+            ub = ub.path(path);
+        }
+        return ub.build();
+    }
+    private <T> RequestEntity<T> post(String scheme, String host, int port, String path, T object) {
+        URI uri = uri(scheme, host,port, path);
+        var peticion = RequestEntity.post(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(object);
+        return peticion;
+    }
 
     @GetMapping
     public List<User> getAllUsers() {
@@ -48,7 +77,8 @@ public class UserController {
         if(user == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }else{
-            //Hay que hacer post para mandar la notificacion al correo ------------------------------
+            NotificationDTO noti = new NotificationDTO();
+            var peticionNotificacion = post("http","",port,"/notification",noti);
             return  new ResponseEntity<>(HttpStatus.OK);
         }
     }
