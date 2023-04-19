@@ -5,7 +5,7 @@ import com.uma.southdevelopers.dtos.NewStudentDTO;
 import com.uma.southdevelopers.dtos.CompleteNameDTO;
 import org.junit.jupiter.api.Nested;
 import org.springframework.core.ParameterizedTypeReference;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 import com.uma.southdevelopers.entities.Institute;
 import com.uma.southdevelopers.entities.Student;
 import com.uma.southdevelopers.repositories.InstituteRepository;
