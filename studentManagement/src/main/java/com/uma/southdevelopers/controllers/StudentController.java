@@ -96,27 +96,8 @@ public class StudentController {
     @PostMapping("/upload")
     public void uploadCSV(@RequestParam("ficheroEstudiantes") MultipartFile csvFile) throws Exception {
 
-        File file = new File();
-        Files.write(file.toPath(), csvFile.getBytes());
 
-        Reader reader = new InputStreamReader(csvFile.getInputStream());
-        CSVReader csvReader = new CSVReader(reader);
 
-        String[] nextRecord;
-        List<Student> students = new ArrayList<>();
-
-        while ((nextRecord = csvReader.readNext()) != null) {
-            Student student = new Student();
-            student.setDni(nextRecord[0]);
-            System.out.println(nextRecord[0]);
-            //student.setName(nextRecord[1]);
-            //student.setSurname(nextRecord[2]);
-            //student.setAge(Integer.parseInt(nextRecord[3]));
-            //student.setInstitute(serviceInstitute.obtainInstitute(Long.parseLong(nextRecord[4])));
-            //students.add(student);
-        }
-
-        //service.addStudents(students);
 
     }
 
