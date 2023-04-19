@@ -1,18 +1,24 @@
 package com.uma.southdevelopers.controllers;
 
 
-import com.opencsv.CSVReader;
-import com.uma.southdevelopers.dtos.InstituteDTO;
-import com.uma.southdevelopers.dtos.StudentDTO;
+import com.uma.southdevelopers.dtos.ImportacionEstudiantesDTO;
+import com.uma.southdevelopers.dtos.NewStudentDTO;
 
+import com.uma.southdevelopers.dtos.ProblemaImportacionDTO;
+import com.uma.southdevelopers.entities.Enrolment;
 import com.uma.southdevelopers.entities.Institute;
 import com.uma.southdevelopers.entities.Student;
 import com.uma.southdevelopers.service.InstituteDBService;
+import com.uma.southdevelopers.service.MateriaDBService;
 import com.uma.southdevelopers.service.StudentDBService;
 import com.uma.southdevelopers.service.exceptions.EntityDoNotDeleteException;
 import com.uma.southdevelopers.service.exceptions.EntityNotFoundException;
 import com.uma.southdevelopers.service.exceptions.ExistingEntityDniException;
-import oracle.jdbc.proxy.annotation.Post;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.input.BOMInputStream;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +26,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URI;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 @RestController
@@ -35,10 +37,14 @@ public class StudentController {
 
     public StudentDBService service;
     public InstituteDBService serviceInstitute;
+    public MateriaDBService serviceMateria;
 
-    public StudentController(StudentDBService service, InstituteDBService serviceInstitute) {
+    public StudentController(StudentDBService service,
+                             InstituteDBService serviceInstitute,
+                             MateriaDBService serviceMateria) {
         this.service = service;
         this.serviceInstitute = serviceInstitute;
+        this.serviceMateria = serviceMateria;
     }
 
     public static Function<Long, URI> studentUriBuilder(UriComponents uriBuilder) {
@@ -49,18 +55,29 @@ public class StudentController {
     }
 
     @GetMapping
-    public List<StudentDTO> obtainStudents(UriComponentsBuilder uriBuilder) {
-        var students = service.allStudents();
-        Function<Student, StudentDTO> mapper = (p ->
-                StudentDTO.fromStudent(p,
-                        studentUriBuilder(uriBuilder.build())));
-        return students.stream()
-                .map(mapper)
-                .toList();
+    public List<NewStudentDTO> obtainStudents(@RequestParam(value = "idSede", required = false) Long idSede, UriComponentsBuilder uriBuilder) {
+        if(idSede == null) {
+            var students = service.allStudents();
+            Function<Student, NewStudentDTO> mapper = (p ->
+                    NewStudentDTO.fromStudent(p,
+                            studentUriBuilder(uriBuilder.build())));
+            return students.stream()
+                    .map(mapper)
+                    .toList();
+        } else {
+            var students = service.obtainStudentFromSede(idSede);
+            Function<Student, NewStudentDTO> mapper = (p ->
+                    NewStudentDTO.fromStudent(p,
+                            studentUriBuilder(uriBuilder.build())));
+            return students.stream()
+                    .map(mapper)
+                    .toList();
+        }
+
     }
 
     @PostMapping
-    public ResponseEntity<?> addStudent(@RequestBody StudentDTO student, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<?> addStudent(@RequestBody NewStudentDTO student, UriComponentsBuilder uriBuilder) {
         Institute institute = serviceInstitute.obtainInstitute(student.getIdInstituto());
 
         Student stud = student.student(institute);
@@ -73,15 +90,15 @@ public class StudentController {
 
     @GetMapping("/{id}")
     @ResponseStatus(code=HttpStatus.OK)
-    public StudentDTO obtainStudent(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
+    public NewStudentDTO obtainStudent(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
         Student student = service.obtainStudent(id);
-        return StudentDTO.fromStudent(student,
+        return NewStudentDTO.fromStudent(student,
                 studentUriBuilder(uriBuilder.build()));
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(code=HttpStatus.OK)
-    public void updateStudent(@PathVariable Long id, @RequestBody StudentDTO student) {
+    public void updateStudent(@PathVariable Long id, @RequestBody NewStudentDTO student) {
         Institute institute = serviceInstitute.obtainInstitute(student.getIdInstituto());
         Student entidadStudent = student.student(institute);
         entidadStudent.setId(id);
@@ -94,11 +111,56 @@ public class StudentController {
     }
 
     @PostMapping("/upload")
-    public void uploadCSV(@RequestParam("ficheroEstudiantes") MultipartFile csvFile) throws Exception {
+    public ImportacionEstudiantesDTO uploadCSV(@RequestParam("ficheroEstudiantes") MultipartFile csvFile) throws Exception {
 
+        ImportacionEstudiantesDTO importacionEstudiantesDTO = new ImportacionEstudiantesDTO();
 
+        InputStreamReader in = new InputStreamReader(new BOMInputStream(csvFile.getInputStream()), "UTF-8");
 
+        try (BufferedReader fileReader = new BufferedReader(in);
+             CSVParser csvParser = new CSVParser(fileReader,
+                     CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader());) {
 
+            List<Student> tutorials = new ArrayList<Student>();
+            Iterable<CSVRecord> csvRecords = csvParser.getRecords();
+
+            int i = 0;
+            for (CSVRecord csvRecord : csvRecords) {
+                Student student = new Student();
+                student.setNombre(csvRecord.get("Nombre"));
+                student.setApellido1(csvRecord.get("Apellido1"));
+                student.setApellido2(csvRecord.get("Apellido2"));
+                student.setDni(csvRecord.get("DNI/NIF"));
+                Institute institute = serviceInstitute.obtainInstitute(csvRecord.get("CENTRO"));
+                student.setInstituto(institute);
+
+                String[] materias = csvRecord.get("DETALLE_MATERIAS").split(",");
+                List<Enrolment> enrolments = new ArrayList<>();
+                for(int j = 0; j < materias.length; j++) {
+                    Optional<Enrolment> enrolment = serviceMateria.obtainMateria(materias[j]);
+                    if(!enrolment.isPresent()) {
+                        serviceMateria.addEnrolment(new Enrolment(0L, materias[j], true));
+                    }
+                    enrolment = serviceMateria.obtainMateria(materias[j]);
+                    enrolments.add(enrolment.get());
+
+                }
+                student.setMateriasMatriculadas(enrolments);
+
+                service.addStudent(student);
+                importacionEstudiantesDTO.addStudent(student.toDTO());
+
+                // Codigo para parar la importacion
+                // COMENTAR PARA IMPORTAR TODOS LOS REGISTROS
+                /*i ++;
+                if(i == 10){
+                    break;
+                }*/
+
+            }
+
+            return importacionEstudiantesDTO;
+        }
     }
 
     @ExceptionHandler(ExistingEntityDniException.class)

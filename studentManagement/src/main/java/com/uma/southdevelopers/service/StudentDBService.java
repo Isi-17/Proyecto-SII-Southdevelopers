@@ -35,6 +35,15 @@ public class StudentDBService {
         return studentRepository.findAll();
     }
 
+    public List<Student> obtainStudentFromSede(Long idSede) {
+        var studentOptional = studentRepository.findAllByIdSede(idSede);
+        if(studentOptional.isPresent()) {
+            return studentOptional.get();
+        } else {
+            throw new EntityNotFoundException();
+        }
+    }
+
     public Long addStudent(Student student) {
         var studentOptional = studentRepository.findByDni(student.getDni());
         if (studentOptional.isPresent()) {

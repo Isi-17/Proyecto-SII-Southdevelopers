@@ -42,6 +42,15 @@ public class InstituteDBService {
         }
     }
 
+    public Institute obtainInstitute(String name) {
+        var institute = instituteRepository.findByNombre(name);
+        if (institute.isPresent()) {
+            return institute.get();
+        } else {
+            throw new EntityNotFoundException();
+        }
+    }
+
     public void updateInstitute(Institute institute) {
         if (instituteRepository.existsById(institute.getId())) {
             instituteRepository.save(institute);

@@ -1,7 +1,7 @@
 package com.uma.southdevelopers;
 
 import com.uma.southdevelopers.dtos.InstituteDTO;
-import com.uma.southdevelopers.dtos.StudentDTO;
+import com.uma.southdevelopers.dtos.NewStudentDTO;
 import com.uma.southdevelopers.dtos.CompleteNameDTO;
 import org.junit.jupiter.api.Nested;
 import org.springframework.core.ParameterizedTypeReference;
@@ -115,7 +115,7 @@ public class StudentManegementApplicationTests {
             var peticion = get("http", "localhost", port, "/localhost/1");
 
             var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<StudentDTO>() {});
+                    new ParameterizedTypeReference<NewStudentDTO>() {});
 
             assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
         }
@@ -136,7 +136,7 @@ public class StudentManegementApplicationTests {
         public void devuelveListaVaciaEstudiantes(){
             var peticion = get("http", "localhost", port, "/localhost");
             var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<List<StudentDTO>>() {});
+                    new ParameterizedTypeReference<List<NewStudentDTO>>() {});
             assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
             assertThat(respuesta.getBody()).isEmpty();
         }
@@ -161,7 +161,7 @@ public class StudentManegementApplicationTests {
             cn.setApellido2("Moreno");
 
             // Preparamos el ingrediente a insertar
-            var estudiante = StudentDTO.builder()
+            var estudiante = NewStudentDTO.builder()
                     .nombreCompleto(cn)
                     .build();
 
@@ -220,7 +220,7 @@ public class StudentManegementApplicationTests {
             cn.setApellido1("Escudero");
             cn.setApellido2("Moreno");
 
-            var estudiante = StudentDTO.builder()
+            var estudiante = NewStudentDTO.builder()
                     .nombreCompleto(cn)
                     .id(1L)
                     .build();
@@ -281,7 +281,7 @@ public class StudentManegementApplicationTests {
             cn.setApellido1("Escudero");
             cn.setApellido2("Moreno");
 
-            var estudiante = StudentDTO.builder()
+            var estudiante = NewStudentDTO.builder()
                     .nombreCompleto(cn)
                     .id(1L)
                     .build();
@@ -343,7 +343,7 @@ public class StudentManegementApplicationTests {
             cn.setApellido1("Escudero");
             cn.setApellido2("Moreno");
 
-            var estudiante = StudentDTO.builder()
+            var estudiante = NewStudentDTO.builder()
                     .nombreCompleto(cn)
                     .id(1L)
                     .build();
@@ -397,7 +397,7 @@ public class StudentManegementApplicationTests {
             cn.setApellido1("Escudero");
             cn.setApellido2("Moreno");
 
-            var estudiante1 = StudentDTO.builder()
+            var estudiante1 = NewStudentDTO.builder()
                     .nombreCompleto(cn)
                     .id(1L)
                     .build();
@@ -406,7 +406,7 @@ public class StudentManegementApplicationTests {
 
             var respuestaPost1 = restTemplate.exchange(peticionPost, Void.class);
 
-            var estudiante2 = StudentDTO.builder()
+            var estudiante2 = NewStudentDTO.builder()
                     .nombreCompleto(cn)
                     .id(1L)
                     .build();
@@ -456,7 +456,7 @@ public class StudentManegementApplicationTests {
             cn.setApellido1("Escudero");
             cn.setApellido2("Moreno");
 
-            var estudiante = StudentDTO.builder()
+            var estudiante = NewStudentDTO.builder()
                     .nombreCompleto(cn)
                     .id(1L)
                     .build();
@@ -509,7 +509,7 @@ public class StudentManegementApplicationTests {
             cn.setApellido1("Escudero");
             cn.setApellido2("Moreno");
 
-            var estudiante1 = StudentDTO.builder()
+            var estudiante1 = NewStudentDTO.builder()
                     .nombreCompleto(cn)
                     .id(1L)
                     .build();

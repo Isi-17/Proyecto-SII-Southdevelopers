@@ -1,6 +1,8 @@
 package com.uma.southdevelopers.entities;
 
 
+import com.uma.southdevelopers.dtos.StudentDTO;
+import com.uma.southdevelopers.dtos.CompleteNameDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,5 +29,18 @@ public class Student {
     @OneToOne
     private Institute instituto;
     private boolean noEliminar;
+
+    public StudentDTO toDTO(){
+
+        return new StudentDTO(this.Id,
+                new CompleteNameDTO(this.nombre, this.apellido1, this.apellido2),
+                this.dni,
+                this.telefono,
+                this.email,
+                this.materiasMatriculadas,
+                this.idSede,
+                this.instituto,
+                this.noEliminar);
+    }
 
 }
