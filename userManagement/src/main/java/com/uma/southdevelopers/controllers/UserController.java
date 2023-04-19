@@ -1,9 +1,6 @@
 package com.uma.southdevelopers.controllers;
 
-import com.uma.southdevelopers.dto.NotificationDTO;
-import com.uma.southdevelopers.dto.PasswordresetDTO;
-import com.uma.southdevelopers.dto.LoginDTO;
-import com.uma.southdevelopers.dto.RespuestaTokenDTO;
+import com.uma.southdevelopers.dto.*;
 import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.service.JwtService;
 import com.uma.southdevelopers.service.UserService;
@@ -73,7 +70,12 @@ public class UserController {
     
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody UserDTO userDto) {
+        User user = new User();
+        user.setUserId(Long.valueOf(userDto.getId()));
+        user.setEmail(userDto.getEmail());
+        user.setName(userDto.getNombre());
+        user.setSurname(userDto.getApellido1()+" "+userDto.getApellido2());
         User savedUser = userService.createUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
