@@ -9,16 +9,22 @@ import com.uma.southdevelopers.service.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.relation.Role;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
@@ -83,5 +89,24 @@ public class UserService {
     public boolean correctPassword(String email, String password) {
         Optional<User> maybyUser = userRepository.findByEmail(email);
         return maybyUser.isPresent() && passwordEncoder.matches(password, maybyUser.get().getPassword());
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        Optional<User> maybyUser = userRepository.findByEmail(username);
+
+        if (maybyUser.isEmpty()) {
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+
+        User user = maybyUser.get();
+
+        Set<SimpleGrantedAuthority> auths = new java.util.HashSet<>();
+        Set<User.Role> roles = user.getRoles();
+        roles.forEach(rol -> auths.add(new SimpleGrantedAuthority("ROLE_" + rol.toString())));
+
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
+                auths);
     }
 }

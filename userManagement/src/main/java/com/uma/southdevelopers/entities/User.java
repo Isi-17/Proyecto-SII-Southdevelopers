@@ -11,6 +11,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -18,7 +20,7 @@ import java.util.Collection;
 @NoArgsConstructor(force = true)
 public class User {
 
-    enum Rol {
+    public enum Role {
         ESTUDIANTE, RESPONSABLE_SEDE, VIGILANTE_AULA, CORRECTOR, ADMINISTRADOR
     }
 
@@ -35,7 +37,7 @@ public class User {
     @NonNull
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Rol rol;
+    @ElementCollection(fetch = FetchType.EAGER) @Enumerated(EnumType.STRING)
+    private Set<Role> roles = new HashSet<>();
 
 }

@@ -1,7 +1,10 @@
 package com.uma.southdevelopers.dto;
 
+import com.uma.southdevelopers.entities.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 @NoArgsConstructor
 @Data
