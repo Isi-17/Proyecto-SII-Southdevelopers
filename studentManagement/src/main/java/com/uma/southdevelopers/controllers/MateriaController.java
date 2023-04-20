@@ -1,8 +1,7 @@
 package com.uma.southdevelopers.controllers;
 
-import com.uma.southdevelopers.entities.Enrolment;
+import com.uma.southdevelopers.entities.Subject;
 import com.uma.southdevelopers.service.MateriaDBService;
-import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponents;
@@ -30,15 +29,15 @@ public class MateriaController {
     }
 
     @GetMapping
-    public List<Enrolment> obtainMaterias(UriComponentsBuilder uriBuilder) {
+    public List<Subject> obtainMaterias(UriComponentsBuilder uriBuilder) {
         var materias = service.allEnrolments();
         return materias.stream()
                 .toList();
     }
 
     @PostMapping
-    public ResponseEntity<?> addMateria(@RequestBody Enrolment enrolment, UriComponentsBuilder uriBuilder) {
-        Long id = service.addEnrolment(enrolment);
+    public ResponseEntity<?> addMateria(@RequestBody Subject subject, UriComponentsBuilder uriBuilder) {
+        Long id = service.addEnrolment(subject);
         return ResponseEntity.created(materiaUriBuilder(uriBuilder.build()).apply(id))
                 .build();
     }

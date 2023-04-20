@@ -24,7 +24,7 @@ public class Student {
     private String telefono;
     private String email;
     @ManyToMany
-    private List<Enrolment> materiasMatriculadas;
+    private List<Enrolment> matriculas;
     private Long idSede;
     @OneToOne
     private Institute instituto;
@@ -37,7 +37,7 @@ public class Student {
                 this.dni,
                 this.telefono,
                 this.email,
-                this.materiasMatriculadas,
+                this.matriculas,
                 this.idSede,
                 this.instituto,
                 this.noEliminar);

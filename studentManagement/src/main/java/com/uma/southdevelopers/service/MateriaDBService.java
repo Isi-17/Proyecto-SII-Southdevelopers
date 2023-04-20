@@ -1,10 +1,8 @@
 package com.uma.southdevelopers.service;
 
 
-import com.uma.southdevelopers.entities.Enrolment;
-import com.uma.southdevelopers.entities.Institute;
+import com.uma.southdevelopers.entities.Subject;
 import com.uma.southdevelopers.repositories.EnrolmentRepository;
-import com.uma.southdevelopers.service.exceptions.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,21 +21,21 @@ public class MateriaDBService {
         this.enrolmentRepository = enrolmentRepository;
     }
 
-    public List<Enrolment> allEnrolments() {
+    public List<Subject> allEnrolments() {
         return enrolmentRepository.findAll();
     }
 
-    public Long addEnrolment(Enrolment enrolment) {
-        enrolment.setId(null);
-        enrolmentRepository.save(enrolment);
-        return enrolment.getId();
+    public Long addEnrolment(Subject subject) {
+        subject.setId(null);
+        enrolmentRepository.save(subject);
+        return subject.getId();
     }
 
-    public Optional<Enrolment> obtainMateria(String name) {
+    public Optional<Subject> obtainMateria(String name) {
         return enrolmentRepository.findByNombre(name);
     }
 
-    public Optional<Enrolment> obtainMateria(Long id) {
+    public Optional<Subject> obtainMateria(Long id) {
         return enrolmentRepository.findById(id);
     }
 

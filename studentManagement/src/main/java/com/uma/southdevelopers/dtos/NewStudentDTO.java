@@ -1,7 +1,7 @@
 package com.uma.southdevelopers.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.uma.southdevelopers.entities.Enrolment;
+import com.uma.southdevelopers.entities.Subject;
 import com.uma.southdevelopers.entities.Institute;
 import com.uma.southdevelopers.entities.Student;
 import lombok.*;
@@ -41,8 +41,8 @@ public class NewStudentDTO {
         dto.setTelefono(student.getTelefono());
         dto.setEmail(student.getEmail());
         List<Long> materias = new ArrayList<>();
-        for (Enrolment enrolment : student.getMateriasMatriculadas()) {
-            materias.add(enrolment.getId());
+        for (Subject subject : student.getMatriculas()) {
+            materias.add(subject.getId());
         }
         dto.setMateriasMatriculadas(materias);
         dto.setIdSede(student.getIdSede());
@@ -55,7 +55,7 @@ public class NewStudentDTO {
         return dto;
     }
 
-    public Student student(Institute institute, List<Enrolment> materiasMatriculadas) {
+    public Student student(Institute institute, List<Subject> materiasMatriculadas) {
         var stud = new Student();
 
         stud.setId(id);
@@ -65,7 +65,7 @@ public class NewStudentDTO {
         stud.setDni(dni);
         stud.setTelefono(telefono);
         stud.setEmail(email);
-        stud.setMateriasMatriculadas(materiasMatriculadas);
+        stud.setMatriculas(materiasMatriculadas);
         stud.setIdSede(idSede);
         stud.setInstituto(institute);
         stud.setNoEliminar(noEliminar);

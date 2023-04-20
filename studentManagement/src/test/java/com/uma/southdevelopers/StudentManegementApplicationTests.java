@@ -3,6 +3,7 @@ package com.uma.southdevelopers;
 import com.uma.southdevelopers.dtos.InstituteDTO;
 import com.uma.southdevelopers.dtos.NewStudentDTO;
 import com.uma.southdevelopers.dtos.CompleteNameDTO;
+import com.uma.southdevelopers.entities.Subject;
 import org.junit.jupiter.api.Nested;
 import org.springframework.core.ParameterizedTypeReference;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("En el servicio de estudiantes")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class StudentManegementApplicationTests {
+
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -93,7 +96,7 @@ public class StudentManegementApplicationTests {
         assertThat(actual.getIdSede()).isEqualTo(expected.getIdSede());
         assertThat(actual.getTelefono()).isEqualTo(expected.getTelefono());
         assertThat(actual.getInstituto()).isEqualTo(expected.getInstituto());
-        assertThat(actual.getMateriasMatriculadas()).isEqualTo(expected.getMateriasMatriculadas());
+        assertThat(actual.getMatriculas()).isEqualTo(expected.getMatriculas());
     }
 
     private void checkFields(Institute expected, Institute actual) {
@@ -134,9 +137,11 @@ public class StudentManegementApplicationTests {
         @Test
         @DisplayName("devuelve una lista vacía de estudiantes")
         public void devuelveListaVaciaEstudiantes(){
-            var peticion = get("http", "localhost", port, "/localhost");
+            var peticion = get("http", "localhost", port, "/estudiantes");
+
             var respuesta = restTemplate.exchange(peticion,
                     new ParameterizedTypeReference<List<NewStudentDTO>>() {});
+
             assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
             assertThat(respuesta.getBody()).isEmpty();
         }
@@ -144,7 +149,7 @@ public class StudentManegementApplicationTests {
         @Test
         @DisplayName("devuelve una lista vacía de institutos")
         public void devuelveListaVaciaInstitutos(){
-            var peticion = get("http", "localhost", port, "/localhost");
+            var peticion = get("http", "localhost", port, "/institutos");
             var respuesta = restTemplate.exchange(peticion,
                     new ParameterizedTypeReference<List<InstituteDTO>>() {});
             assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
@@ -155,32 +160,45 @@ public class StudentManegementApplicationTests {
         @DisplayName("inserta correctamente un estudiante")
         public void insertaEstudiante(){
 
+            Institute instituto = new Institute();
+            instituto.setNombre("IES");
+            instituto.setId(1L);
+
+            restTemplate.exchange(post("http", "localhost", port, "/institutos",
+                    instituto), Void.class);
+
+            Subject materia = new Subject();
+            materia.setNombre("Matematicas");
+            materia.setId(1L);
+
+            restTemplate.exchange(post("http", "localhost", port, "/materias",
+                    materia), Void.class);
+
             CompleteNameDTO cn = new CompleteNameDTO();
             cn.setNombre("Jesus");
             cn.setApellido1("Escudero");
             cn.setApellido2("Moreno");
 
-            // Preparamos el ingrediente a insertar
             var estudiante = NewStudentDTO.builder()
+                    .id(1L)
+                    .materiasMatriculadas(List.of(1L))
+                    .idInstituto(1L)
                     .nombreCompleto(cn)
                     .build();
 
-            // Preparamos la peticion con el estudiante dentro
-            var peticion = post("http", "localhost", port, "/localhost", estudiante);
+            var peticion = post("http", "localhost", port, "/estudiantes",
+                    estudiante);
 
-            // Invocamos al servicio REST
             var respuesta = restTemplate.exchange(peticion, Void.class);
 
-            // Comprobamos el resultado
             assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
-            assertThat(respuesta.getHeaders().get("Location").get(0))
-                    .startsWith("http://localhost:" + port + "/Localhost");
 
             List<Student> estudiantesBD = studentRepo.findAll();
             assertThat(estudiantesBD).hasSize(1);
-            assertThat(respuesta.getHeaders().get("Location").get(0))
-                    .endsWith("/" + estudiantesBD.get(0).getId());
-            //checkFields(estudiante.student(), estudiantesBD.get(0));
+
+            List<Subject> materiasMatriculas = new ArrayList<>();
+            materiasMatriculas.add(materia);
+            checkFields(estudiante.student(instituto, materiasMatriculas), estudiantesBD.get(0));
         }
 
         @Test

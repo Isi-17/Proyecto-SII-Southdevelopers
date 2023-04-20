@@ -4,9 +4,8 @@ package com.uma.southdevelopers.controllers;
 import com.uma.southdevelopers.dtos.ImportacionEstudiantesDTO;
 import com.uma.southdevelopers.dtos.NewStudentDTO;
 
-import com.uma.southdevelopers.dtos.ProblemaImportacionDTO;
 import com.uma.southdevelopers.dtos.StudentDTO;
-import com.uma.southdevelopers.entities.Enrolment;
+import com.uma.southdevelopers.entities.Subject;
 import com.uma.southdevelopers.entities.Institute;
 import com.uma.southdevelopers.entities.Student;
 import com.uma.southdevelopers.service.InstituteDBService;
@@ -19,9 +18,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.input.BOMInputStream;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponents;
@@ -57,35 +54,24 @@ public class StudentController {
 
     @GetMapping
     public List<NewStudentDTO> obtainStudents(@RequestParam(value = "idSede", required = false) Long idSede, UriComponentsBuilder uriBuilder) {
-        if(idSede == null) {
-            var students = service.allStudents();
-            Function<Student, NewStudentDTO> mapper = (p ->
-                    NewStudentDTO.fromStudent(p,
-                            studentUriBuilder(uriBuilder.build())));
-            return students.stream()
-                    .map(mapper)
-                    .toList();
-        } else {
-            var students = service.obtainStudentFromSede(idSede);
-            Function<Student, NewStudentDTO> mapper = (p ->
-                    NewStudentDTO.fromStudent(p,
-                            studentUriBuilder(uriBuilder.build())));
-            return students.stream()
-                    .map(mapper)
-                    .toList();
-        }
-
+        var students = (idSede==null) ? service.allStudents() : service.obtainStudentFromSede(idSede);
+        Function<Student, NewStudentDTO> mapper = (p ->
+                NewStudentDTO.fromStudent(p, studentUriBuilder(uriBuilder.build())));
+        return students.stream()
+                .map(mapper)
+                .toList();
     }
 
     @PostMapping
+    @ResponseStatus(code=HttpStatus.CREATED)
     public StudentDTO addStudent(@RequestBody NewStudentDTO student, UriComponentsBuilder uriBuilder) {
         Institute institute = serviceInstitute.obtainInstitute(student.getIdInstituto());
 
-        List<Enrolment> materias = new ArrayList<>();
+        List<Subject> materias = new ArrayList<>();
         List<Long> materiasFromStudentDTO = student.getMateriasMatriculadas();
 
         for(int i = 0; i < materiasFromStudentDTO.size(); i++) {
-            Optional<Enrolment> materia = serviceMateria.obtainMateria(materiasFromStudentDTO.get(i));
+            Optional<Subject> materia = serviceMateria.obtainMateria(materiasFromStudentDTO.get(i));
             if (materia.isPresent()) {
                 materias.add(materia.get());
             } else {
@@ -113,11 +99,11 @@ public class StudentController {
     public StudentDTO updateStudent(@PathVariable Long id, @RequestBody NewStudentDTO student) {
         Institute institute = serviceInstitute.obtainInstitute(student.getIdInstituto());
 
-        List<Enrolment> materias = new ArrayList<>();
+        List<Subject> materias = new ArrayList<>();
         List<Long> materiasFromStudentDTO = student.getMateriasMatriculadas();
 
         for(int i = 0; i < materiasFromStudentDTO.size(); i++) {
-            Optional<Enrolment> materia = serviceMateria.obtainMateria(materiasFromStudentDTO.get(i));
+            Optional<Subject> materia = serviceMateria.obtainMateria(materiasFromStudentDTO.get(i));
             if (materia.isPresent()) {
                 materias.add(materia.get());
             } else {
@@ -161,17 +147,17 @@ public class StudentController {
                 student.setInstituto(institute);
 
                 String[] materias = csvRecord.get("DETALLE_MATERIAS").split(",");
-                List<Enrolment> enrolments = new ArrayList<>();
+                List<Subject> subjects = new ArrayList<>();
                 for(int j = 0; j < materias.length; j++) {
-                    Optional<Enrolment> enrolment = serviceMateria.obtainMateria(materias[j]);
+                    Optional<Subject> enrolment = serviceMateria.obtainMateria(materias[j]);
                     if(!enrolment.isPresent()) {
-                        serviceMateria.addEnrolment(new Enrolment(0L, materias[j], true));
+                        serviceMateria.addEnrolment(new Subject(0L, materias[j], true));
                     }
                     enrolment = serviceMateria.obtainMateria(materias[j]);
-                    enrolments.add(enrolment.get());
+                    subjects.add(enrolment.get());
 
                 }
-                student.setMateriasMatriculadas(enrolments);
+                student.setMatriculas(subjects);
 
                 service.addStudent(student);
                 importacionEstudiantesDTO.addStudent(student.toDTO());
