@@ -37,4 +37,8 @@ public class MateriaDBService {
         return enrolmentRepository.findByNombre(name);
     }
 
+    public Optional<Enrolment> obtainMateria(Long id) {
+        return enrolmentRepository.findById(id);
+    }
+
 }

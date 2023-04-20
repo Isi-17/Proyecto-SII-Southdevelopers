@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.function.Function;
 
 @Getter
@@ -22,7 +23,7 @@ public class NewStudentDTO {
     private String dni;
     private String telefono;
     private String email;
-    private List<Enrolment> materiasMatriculadas;
+    private List<Long> materiasMatriculadas;
     private Long idSede;
     private Long idInstituto;
     private boolean noEliminar;
@@ -39,7 +40,11 @@ public class NewStudentDTO {
         dto.setDni(student.getDni());
         dto.setTelefono(student.getTelefono());
         dto.setEmail(student.getEmail());
-        dto.setMateriasMatriculadas(student.getMateriasMatriculadas());
+        List<Long> materias = new ArrayList<>();
+        for (Enrolment enrolment : student.getMateriasMatriculadas()) {
+            materias.add(enrolment.getId());
+        }
+        dto.setMateriasMatriculadas(materias);
         dto.setIdSede(student.getIdSede());
         dto.setIdInstituto(student.getInstituto().getId());
         dto.setNoEliminar(student.isNoEliminar());
@@ -50,7 +55,7 @@ public class NewStudentDTO {
         return dto;
     }
 
-    public Student student(Institute institute) {
+    public Student student(Institute institute, List<Enrolment> materiasMatriculadas) {
         var stud = new Student();
 
         stud.setId(id);

@@ -5,6 +5,7 @@ import com.uma.southdevelopers.dtos.ImportacionEstudiantesDTO;
 import com.uma.southdevelopers.dtos.NewStudentDTO;
 
 import com.uma.southdevelopers.dtos.ProblemaImportacionDTO;
+import com.uma.southdevelopers.dtos.StudentDTO;
 import com.uma.southdevelopers.entities.Enrolment;
 import com.uma.southdevelopers.entities.Institute;
 import com.uma.southdevelopers.entities.Student;
@@ -77,15 +78,26 @@ public class StudentController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addStudent(@RequestBody NewStudentDTO student, UriComponentsBuilder uriBuilder) {
+    public StudentDTO addStudent(@RequestBody NewStudentDTO student, UriComponentsBuilder uriBuilder) {
         Institute institute = serviceInstitute.obtainInstitute(student.getIdInstituto());
 
-        Student stud = student.student(institute);
+        List<Enrolment> materias = new ArrayList<>();
+        List<Long> materiasFromStudentDTO = student.getMateriasMatriculadas();
+
+        for(int i = 0; i < materiasFromStudentDTO.size(); i++) {
+            Optional<Enrolment> materia = serviceMateria.obtainMateria(materiasFromStudentDTO.get(i));
+            if (materia.isPresent()) {
+                materias.add(materia.get());
+            } else {
+                throw new EntityNotFoundException();
+            }
+        }
+
+        Student stud = student.student(institute, materias);
 
         Long id = service.addStudent(stud);
 
-        return ResponseEntity.created(studentUriBuilder(uriBuilder.build()).apply(id))
-                .build();
+        return stud.toDTO();
     }
 
     @GetMapping("/{id}")
@@ -98,11 +110,25 @@ public class StudentController {
 
     @PutMapping("/{id}")
     @ResponseStatus(code=HttpStatus.OK)
-    public void updateStudent(@PathVariable Long id, @RequestBody NewStudentDTO student) {
+    public StudentDTO updateStudent(@PathVariable Long id, @RequestBody NewStudentDTO student) {
         Institute institute = serviceInstitute.obtainInstitute(student.getIdInstituto());
-        Student entidadStudent = student.student(institute);
+
+        List<Enrolment> materias = new ArrayList<>();
+        List<Long> materiasFromStudentDTO = student.getMateriasMatriculadas();
+
+        for(int i = 0; i < materiasFromStudentDTO.size(); i++) {
+            Optional<Enrolment> materia = serviceMateria.obtainMateria(materiasFromStudentDTO.get(i));
+            if (materia.isPresent()) {
+                materias.add(materia.get());
+            } else {
+                throw new EntityNotFoundException();
+            }
+        }
+
+        Student entidadStudent = student.student(institute, materias);
         entidadStudent.setId(id);
         service.updateStudent(entidadStudent);
+        return entidadStudent.toDTO();
     }
 
     @DeleteMapping("/{id}")

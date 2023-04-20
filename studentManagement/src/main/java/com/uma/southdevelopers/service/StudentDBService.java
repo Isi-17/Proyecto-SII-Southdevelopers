@@ -44,6 +44,15 @@ public class StudentDBService {
         }
     }
 
+    public List<Student> obtainStudentFromInstitute(Institute institute) {
+        var studentOptional = studentRepository.findAllByInstituto(institute);
+        if(studentOptional.isPresent()) {
+            return studentOptional.get();
+        } else {
+            throw new EntityNotFoundException();
+        }
+    }
+
     public Long addStudent(Student student) {
         var studentOptional = studentRepository.findByDni(student.getDni());
         if (studentOptional.isPresent()) {
@@ -68,7 +77,13 @@ public class StudentDBService {
         if (studentRepository.existsById(student.getId())) {
             var studentOptional = studentRepository.findByDni(student.getDni());
             if (!(studentOptional.isPresent() && !studentOptional.get().getId().equals(student.getId()))) {
-                studentRepository.save(student);
+                Student studentFromDB = studentRepository.findById(student.getId()).get();
+                if(studentFromDB.isNoEliminar() && !student.isNoEliminar()) {
+                    student.setNoEliminar(true);
+                    studentRepository.save(student);
+                } else {
+                    studentRepository.save(student);
+                }
             } else {
                 throw new ExistingEntityDniException();
             }
