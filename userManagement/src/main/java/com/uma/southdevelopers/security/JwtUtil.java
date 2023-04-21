@@ -1,5 +1,6 @@
 package com.uma.southdevelopers.security;
 
+import io.jsonwebtoken.io.Decoders;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -23,13 +24,13 @@ public class JwtUtil implements Serializable{
 
     private static final long serialVersionUID = -2550185165626007488L;
 
-    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60 * 1000;
 
     @Value("${jwt.secret}")
-    private String secret;
+    private String SECRET;
 
     //retrieve username from jwt token
-    public String getUsernameFromToken(String token) {
+    public String getUserEmailFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
@@ -51,9 +52,7 @@ public class JwtUtil implements Serializable{
     }
 
     private Claims getAllClaimsFromToken(String token) {
-        byte[] keyBytes = secret.getBytes();
-        Key key = Keys.hmacShaKeyFor(keyBytes);
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(token).getBody();
     }
 
     public Boolean isTokenExpired(String token) {
@@ -67,21 +66,23 @@ public class JwtUtil implements Serializable{
                 userDetails.getAuthorities().stream()
                         .map(ga->ga.getAuthority().substring(5))
                         .collect(Collectors.toList()));
-        return doGenerateToken(claims, userDetails.getUsername());
+        return generateToken(claims, userDetails.getUsername());
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
-        byte[] keyBytes = secret.getBytes();
-        Key key = Keys.hmacShaKeyFor(keyBytes);
-
+    private String generateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setClaims(claims).setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-                .signWith(key, SignatureAlgorithm.HS512).compact();
+                .signWith(getKey(), SignatureAlgorithm.HS512).compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public Key getKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public boolean validateToken(String token, UserDetails userDetails) {
+        final String userEmail = getUserEmailFromToken(token);
+        return (userEmail.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }

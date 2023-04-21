@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.uma.southdevelopers.dto.RespuestaTokenDTO;
 import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.repositories.UserRepository;
+import com.uma.southdevelopers.security.PasswordUtils;
 import com.uma.southdevelopers.service.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.management.relation.Role;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 
 @Service
@@ -47,6 +49,10 @@ public class UserService implements UserDetailsService {
 
     public Optional<User> getUserByEmail(String email){ return  userRepository.findByEmail(email);}
 
+    public boolean existUserWithEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -63,15 +69,16 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public User resetPassword(String email){
+    public Optional<String> resetPassword(String email){
         Optional<User> maybeUser = userRepository.findByEmail(email);
-        if(!maybeUser.isPresent()){
-           throw new UserNotFoundException();
-        }else{
-            User user = maybeUser.get();
-            user.setPassword("nuevaAleatoria");
-            return userRepository.save(user);
+        if(maybeUser.isEmpty()){
+            return null;
         }
+        User user = maybeUser.get();
+        String newPassword = PasswordUtils.createPassword();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return Optional.of(newPassword);
     }
 
     public void deleteUser(Long userId) {
@@ -82,25 +89,16 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public boolean existUserByEmail(String email){
-        return userRepository.existByEmail(email);
-    }
-
     public boolean correctPassword(String email, String password) {
         Optional<User> maybyUser = userRepository.findByEmail(email);
         return maybyUser.isPresent() && passwordEncoder.matches(password, maybyUser.get().getPassword());
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        Optional<User> maybyUser = userRepository.findByEmail(username);
-
-        if (maybyUser.isEmpty()) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
-
-        User user = maybyUser.get();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         Set<SimpleGrantedAuthority> auths = new java.util.HashSet<>();
         Set<User.Role> roles = user.getRoles();

@@ -2,7 +2,11 @@ package com.uma.southdevelopers.controllers;
 
 import com.uma.southdevelopers.dto.*;
 import com.uma.southdevelopers.entities.User;
+import com.uma.southdevelopers.security.JwtUtil;
+import com.uma.southdevelopers.security.PasswordUtils;
 import com.uma.southdevelopers.service.UserService;
+import com.uma.southdevelopers.service.exceptions.WrongCredentialsException;
+import io.jsonwebtoken.Jwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -17,18 +21,25 @@ import org.springframework.web.util.UriBuilderFactory;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/usuarios")
-
 public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @Value(value="${local.server.port}")
     private int port;
 
-    private URI uri(String scheme, String host, int port, String ...paths) {
+    @Value(value="${local.server.host}")
+    private String host;
+
+    private String uri(String scheme, String host, int port, String ...paths) {
         UriBuilderFactory ubf = new DefaultUriBuilderFactory();
         UriBuilder ub = ubf.builder()
                 .scheme(scheme)
@@ -36,19 +47,12 @@ public class UserController {
         for (String path: paths) {
             ub = ub.path(path);
         }
-        return ub.build();
-    }
-    private <T> RequestEntity<T> post(String scheme, String host, int port, String path, T object) {
-        URI uri = uri(scheme, host,port, path);
-        var peticion = RequestEntity.post(uri)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(object);
-        return peticion;
+        return ub.build().toString();
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public List<UserDTO> getAllUsers() {
+        return userService.getAllUsers().stream().map(user -> UserDTO.fromUser(user)).toList();
     }
 
     @GetMapping("/{id}")
@@ -63,26 +67,25 @@ public class UserController {
     
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody UserDTO userDto) {
-        User user = new User();
-        user.setUserId(Long.valueOf(userDto.getId()));
-        user.setEmail(userDto.getEmail());
-        user.setName(userDto.getNombre());
-        user.setSurname(userDto.getApellido1()+" "+userDto.getApellido2());
+    public ResponseEntity<?> createUser(@RequestBody UserDTO userDto) {
+        if(userService.existUserWithEmail(userDto.getEmail())){
+            return ResponseEntity.status(409).body("Hay un usuario con el mismo correo electrónico en el sistema");
+        }
+        User user = userDto.user();
+        String password = PasswordUtils.createPassword();
+        user.setPassword(password);
         User savedUser = userService.createUser(user);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        return ResponseEntity.ok(uri("http", host, port, "/usuarios/"+savedUser.getUserId()));
     }
 
     @PostMapping("/passwordreset")
-    public ResponseEntity<User> resetPassword(@RequestBody PasswordresetDTO pssDTO){
-        User user = userService.resetPassword(pssDTO.getEmail());
-        if(user == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }else{
-            NotificationDTO noti = new NotificationDTO();
-            var peticionNotificacion = post("http","",port,"/notification",noti);
-            return  new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<String> resetPassword(@RequestBody PasswordresetDTO pssDTO){
+        Optional<String> newPassword = userService.resetPassword(pssDTO.getEmail());
+        if(newPassword.isEmpty()) {
+            return ResponseEntity.ok().build();
         }
+        // TODO: enviar contraseña por correo
+        return  ResponseEntity.ok(newPassword.get()); // TODO: devolvemos contraseña para las pruebas, quitar.
     }
 
     @PutMapping("/{id}")
@@ -100,8 +103,17 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String logUser(@RequestBody LoginDTO login) {
-        return "Login";
+    public ResponseEntity<RespuestaTokenDTO> logUser(@RequestBody LoginDTO login) {
+        if(!userService.correctPassword(login.getEmail(), login.getPassword())){
+            throw new WrongCredentialsException();
+        }
+        String token = jwtUtil.generateToken(userService.loadUserByUsername(login.getEmail()));
+        return ResponseEntity.ok(new RespuestaTokenDTO(token));
+    }
+
+    @ExceptionHandler(WrongCredentialsException.class)
+    public ResponseEntity<?> badCredentials(){
+        return ResponseEntity.status(403).body("Credenciales no correctas");
     }
 }
 

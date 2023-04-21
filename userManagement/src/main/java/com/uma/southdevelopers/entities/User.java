@@ -1,10 +1,7 @@
 package com.uma.southdevelopers.entities;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,30 +11,35 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+@Table(name = "_user")
 @Entity
 @Data
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
-@NoArgsConstructor(force = true)
 public class User {
 
     public enum Role {
-        ESTUDIANTE, RESPONSABLE_SEDE, VIGILANTE_AULA, CORRECTOR, ADMINISTRADOR
+        RESPONSABLE_SEDE, VIGILANTE_AULA, CORRECTOR, VICERRECTORADO
     }
 
     @Id @GeneratedValue
     private Long userId;
 
+    @Column(unique = true)
     private String email;
 
-    @NonNull
+    @Column(nullable = false)
     private String name;
 
-    private String surname;
+    private String surname1;
 
-    @NonNull
+    private String surname2;
+
+    @Column(nullable = false)
     private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER) @Enumerated(EnumType.STRING)
+    @ElementCollection @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
 }

@@ -37,26 +37,26 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         final String requestTokenHeader = request.getHeader("Authorization");
 
-        String username = null;
+        String userEmail = null;
         String jwtToken = null;
         // JWT Token is in the form "Bearer token". Remove Bearer word and get
         // only the Token
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
-                username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+                userEmail = jwtTokenUtil.getUserEmailFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
                 System.out.println("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT Token has expired");
             }
-            logger.warn("username = " + username);
+            logger.warn("username = " + userEmail);
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
         }
 
         // Once we get the token validate it.
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             Collection<String> roles = jwtTokenUtil.getRolesFromToken(jwtToken);
             logger.warn(roles.toString());
@@ -64,11 +64,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             Set<GrantedAuthority> auths = new HashSet<>();
             roles.forEach(rol -> auths.add(new SimpleGrantedAuthority("ROLE_" + rol.toString())));
 
-            UserDetails userDetails = new User(username, "", auths);
+            UserDetails userDetails = userService.loadUserByUsername(userEmail);
 
             // if token is valid configure Spring Security to manually set
             // authentication
-            if (!jwtTokenUtil.isTokenExpired(jwtToken)) {
+            if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
 
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
