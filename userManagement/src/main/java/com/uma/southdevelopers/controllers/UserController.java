@@ -19,6 +19,7 @@ import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -48,6 +49,25 @@ public class UserController {
             ub = ub.path(path);
         }
         return ub.build().toString();
+    }
+
+    private URI uri2(String scheme, String host, int port, String ...paths) {
+        UriBuilderFactory ubf = new DefaultUriBuilderFactory();
+        UriBuilder ub = ubf.builder()
+                .scheme(scheme)
+                .host(host).port(port);
+        for (String path: paths) {
+            ub = ub.path(path);
+        }
+        return ub.build();
+    }
+
+    private <T> RequestEntity<T> post(String scheme, String host, int port, String path, T object) {
+        URI uri = uri2(scheme, host,port, path);
+        var peticion = RequestEntity.post(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(object);
+        return peticion;
     }
 
     @GetMapping
@@ -81,10 +101,18 @@ public class UserController {
     @PostMapping("/passwordreset")
     public ResponseEntity<String> resetPassword(@RequestBody PasswordresetDTO pssDTO){
         Optional<String> newPassword = userService.resetPassword(pssDTO.getEmail());
-        if(newPassword.isEmpty()) {
+        if(newPassword.isEmpty()) { // TODO: No seria negado o la salida no debería ser no ok? <Jay>
             return ResponseEntity.ok().build();
         }
         // TODO: enviar contraseña por correo
+        NotificationDTO notiDTO = new NotificationDTO();
+        notiDTO.setEmailDestino(pssDTO.getEmail());
+        notiDTO.setCuerpo(newPassword.get());
+        notiDTO.setAsunto("Restablecer contraseña");
+        List<String> medios = new ArrayList<>();
+        medios.add("EMAIL");
+        notiDTO.setMedios(medios);
+        var peticion = post("http",host,port,"/notification",notiDTO); //TODO: el host habría que cambiarlo
         return  ResponseEntity.ok(newPassword.get()); // TODO: devolvemos contraseña para las pruebas, quitar.
     }
 
