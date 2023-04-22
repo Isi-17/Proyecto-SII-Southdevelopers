@@ -113,7 +113,7 @@ public class userManagementTest {
         @DisplayName("inserta correctamente un usuario")
         public void insertaUsuario() {
 
-            // Preparamos el ingrediente a insertar
+            // Preparamos el usuario a insertar
             var userDTO = UserDTO.builder()
                     .id(66667777)
                     .nombre("Paco")
@@ -121,8 +121,8 @@ public class userManagementTest {
                     .apellido2("Garcia")
                     .email("pepegg@gmail.com")
                     .build();
-            // Preparamos la petición con el ingrediente dentro
-            var peticion = post("http", host, port, "/ingredientes", userDTO);
+            // Preparamos la petición con el usuario dentro
+            var peticion = post("http", host, port, "/usuarios", userDTO);
 
             // Invocamos al servicio REST
             var respuesta = restTemplate.exchange(peticion,Void.class);
