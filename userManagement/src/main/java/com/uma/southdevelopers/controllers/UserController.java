@@ -31,6 +31,9 @@ public class UserController {
     private UserService userService;
 
     @Autowired
+    RestTemplate restTemplate;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     @Value(value="${local.server.port}")
@@ -99,8 +102,11 @@ public class UserController {
                 .tipoDeNotificacion("PASSWORD_RESET")
                 .medios(List.of("EMAIL"))
                 .build();
+
         var peticion = post("http", host, port,"/notification", notiDTO);
-        // new RestTemplate().exchange(peticion, Void.class);
+
+        var respuesta = restTemplate.exchange(peticion, Void.class);
+
         return  ResponseEntity.ok(newPassword.get()); // TODO: devolvemos contraseña para las pruebas, quitar.
     }
 
