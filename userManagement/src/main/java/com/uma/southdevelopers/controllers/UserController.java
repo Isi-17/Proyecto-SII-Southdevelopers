@@ -2,6 +2,7 @@ package com.uma.southdevelopers.controllers;
 
 import com.uma.southdevelopers.dto.*;
 import com.uma.southdevelopers.entities.User;
+import com.uma.southdevelopers.controllers.NotificationControllerDummie;
 import com.uma.southdevelopers.security.JwtUtil;
 import com.uma.southdevelopers.security.PasswordUtils;
 import com.uma.southdevelopers.service.UserService;
@@ -9,6 +10,7 @@ import com.uma.southdevelopers.service.exceptions.UserNotFoundException;
 import com.uma.southdevelopers.service.exceptions.WrongCredentialsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
@@ -31,7 +33,7 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -41,6 +43,11 @@ public class UserController {
 
     @Value(value="${local.server.host}")
     private String host;
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 
     private URI uri(String scheme, String host, int port, String ...paths) {
         UriBuilderFactory ubf = new DefaultUriBuilderFactory();
@@ -103,9 +110,13 @@ public class UserController {
                 .medios(List.of("EMAIL"))
                 .build();
 
-        var peticion = post("http", host, port,"/notification", notiDTO);
+        //En caso de que las notificaciones fuesen por una api externa:
+        /*var peticion = post("http", notiHost, port,"/notification", notiDTO);
 
-        var respuesta = restTemplate.exchange(peticion, Void.class);
+        var respuesta = restTemplate.exchange(peticion, Void.class);*/
+
+        //En caso de que este en la misma api (tengo problemas por que el metodo no es estatico)
+        /*NotificationControllerDummie.enviarNoti(notiDTO);*/
 
         return  ResponseEntity.ok(newPassword.get()); // TODO: devolvemos contraseña para las pruebas, quitar.
     }
