@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.uma.southdevelopers.dto.UserDTO;
 import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.repositories.UserRepository;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,9 @@ public class userManagementTest {
 
     @Value(value="${local.server.port}")
     private int port;
+
+    @Value(value="${local.server.host}")
+    private String host;
 
     @Autowired
     private UserRepository userRepo;
@@ -82,16 +86,62 @@ public class userManagementTest {
     @Nested
     @DisplayName("Con la Base de Datos Vacia")
     public class BaseDeDatosVacia {
+
+        @Test
+        @DisplayName("devuelve error al acceder a un usuario concreto")
+        public void errorConUsuarioConcreto() {
+            var peticion = get("http", host, port, "/usuarios/1");
+
+            var respuesta = restTemplate.exchange(peticion,
+                    new ParameterizedTypeReference<User>() {});
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+        }
         @Test
         @DisplayName("devuelve una lista vacía de usuarios")
-        public void devuelveListaVaciaProductos() {
-            var peticion = get("http", "localhost",port, "/usuarios");
+        public void devuelveListaVaciaUsuarios() {
+            var peticion = get("http", host, port, "/usuarios");
 
             var respuesta = restTemplate.exchange(peticion,
                     new ParameterizedTypeReference<List<User>>() {});
 
             assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
             assertThat(respuesta.getBody()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("inserta correctamente un usuario")
+        public void insertaUsuario() {
+
+            // Preparamos el ingrediente a insertar
+            var userDTO = UserDTO.builder()
+                    .id(66667777)
+                    .nombre("Paco")
+                    .apellido1("Garcia")
+                    .apellido2("Garcia")
+                    .email("pepegg@gmail.com")
+                    .build();
+            // Preparamos la petición con el ingrediente dentro
+            var peticion = post("http", host, port, "/ingredientes", userDTO);
+
+            // Invocamos al servicio REST
+            var respuesta = restTemplate.exchange(peticion,Void.class);
+
+            // Comprobamos el resultado
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
+            assertThat(respuesta.getHeaders().get("Location").get(0))
+                    .startsWith("http://localhost:"+port+"/usuarios");
+
+            List<User> usuariosBD = userRepo.findAll();
+            assertThat(usuariosBD).hasSize(1);
+            assertThat(respuesta.getHeaders().get("Location").get(0))
+                    .endsWith("/"+usuariosBD.get(0).getUserId());
+
+            assertThat(usuariosBD.get(0).getUserId()).isEqualTo(userDTO.getId());
+            assertThat(usuariosBD.get(0).getName()).isEqualTo(userDTO.getNombre());
+            assertThat(usuariosBD.get(0).getSurname1()).isEqualTo(userDTO.getApellido1());
+            assertThat(usuariosBD.get(0).getSurname2()).isEqualTo(userDTO.getApellido2());
+            assertThat(usuariosBD.get(0).getEmail()).isEqualTo(userDTO.getEmail());
         }
     }
 }

@@ -1,12 +1,13 @@
 package com.uma.southdevelopers.dto;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@NoArgsConstructor
 @Data
+@Builder
 public class NotificationDTO {
     private String asunto;
     private String cuerpo;

@@ -105,13 +105,15 @@ public class UserController {
             return ResponseEntity.ok().build();
         }
         // TODO: enviar contraseña por correo
-        NotificationDTO notiDTO = new NotificationDTO();
-        notiDTO.setEmailDestino(pssDTO.getEmail());
-        notiDTO.setCuerpo(newPassword.get());
-        notiDTO.setAsunto("Restablecer contraseña");
+
         List<String> medios = new ArrayList<>();
         medios.add("EMAIL");
-        notiDTO.setMedios(medios);
+        var notiDTO = NotificationDTO.builder()
+                .emailDestino(pssDTO.getEmail())
+                .cuerpo(newPassword.get())
+                .asunto("Restablecer contraseña")
+                .medios(medios)
+                .build();
         var peticion = post("http",host,port,"/notification",notiDTO); //TODO: el host habría que cambiarlo
         return  ResponseEntity.ok(newPassword.get()); // TODO: devolvemos contraseña para las pruebas, quitar.
     }
