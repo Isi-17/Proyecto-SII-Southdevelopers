@@ -39,18 +39,18 @@ public class SecurityConfig {
                 .permitAll()
                 .requestMatchers(HttpMethod.POST, "/usuarios") // TODO: sin autorizacion para las pruebas, pedir autorizacion
                 .permitAll()
-                .requestMatchers(HttpMethod.POST, "/usuarios/passwordreset") // TODO: esta abierto para las pruebas, pedir token
+                .requestMatchers(HttpMethod.POST,"/usuarios/passwordreset")
                 .permitAll()
-		        .requestMatchers(HttpMethod.GET, "/usuarios/**")
-                .hasAnyRole("ROLE_RESPONSABLE_AULA","ROLE_VIGILANTE_AULA", "RESPONSABLE_AULA","VIGILANTE_AULA",
-                        "VICERRECTORADO", "ROLE_VICERRECTORADO", "ROLE_CORRECTOR", "CORRECTOR")
-                .requestMatchers(HttpMethod.PUT, "/usuarios/**")
-                .hasAnyRole("VICERRECTORADO", "ROLE_VICERRECTORADO")
-                .requestMatchers(HttpMethod.DELETE, "/usuarios/**")
-                .hasAnyRole("VICERRECTORADO", "ROLE_VICERRECTORADO")
-                .requestMatchers(HttpMethod.GET, "/usuarios")
-                .hasAnyRole("ROLE_RESPONSABLE_AULA","ROLE_VIGILANTE_AULA", "RESPONSABLE_AULA","VIGILANTE_AULA",
-                        "VICERRECTORADO", "ROLE_VICERRECTORADO", "ROLE_CORRECTOR", "CORRECTOR")
+//		        .requestMatchers(HttpMethod.GET, "/usuarios/**")
+//                .hasAnyRole("ROLE_RESPONSABLE_AULA","ROLE_VIGILANTE_AULA", "RESPONSABLE_AULA","VIGILANTE_AULA",
+//                        "VICERRECTORADO", "ROLE_VICERRECTORADO", "ROLE_CORRECTOR", "CORRECTOR")
+//                .requestMatchers(HttpMethod.PUT, "/usuarios/**")
+//                .hasAnyRole("VICERRECTORADO", "ROLE_VICERRECTORADO")
+//                .requestMatchers(HttpMethod.DELETE, "/usuarios/**")
+//                .hasAnyRole("VICERRECTORADO", "ROLE_VICERRECTORADO")
+//                .requestMatchers(HttpMethod.GET, "/usuarios")
+//                .hasAnyRole("ROLE_RESPONSABLE_AULA","ROLE_VIGILANTE_AULA", "RESPONSABLE_AULA","VIGILANTE_AULA",
+//                        "VICERRECTORADO", "ROLE_VICERRECTORADO", "ROLE_CORRECTOR", "CORRECTOR")
                 .anyRequest()
                 .authenticated()
                 .and()

@@ -59,20 +59,21 @@ public class UserService implements UserDetailsService {
 
     public User updateUser(Long userId, User user) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isPresent()) {
-            User existingUser = optionalUser.get();
-            user.setUserId(existingUser.getUserId());
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            return userRepository.save(user);
-        } else {
+        if(optionalUser.isEmpty()){
             throw new UserNotFoundException();
         }
+        User existingUser = optionalUser.get();
+        existingUser.setName(user.getName());
+        existingUser.setSurname1(user.getSurname1());
+        existingUser.setSurname2(user.getSurname2());
+        existingUser.setEmail(user.getEmail());
+        return userRepository.save(existingUser);
     }
 
     public Optional<String> resetPassword(String email){
         Optional<User> maybeUser = userRepository.findByEmail(email);
         if(maybeUser.isEmpty()){
-            return null;
+            return Optional.empty();
         }
         User user = maybeUser.get();
         String newPassword = PasswordUtils.createPassword();

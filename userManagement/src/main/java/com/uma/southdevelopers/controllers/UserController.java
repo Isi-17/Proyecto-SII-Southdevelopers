@@ -5,8 +5,8 @@ import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.security.JwtUtil;
 import com.uma.southdevelopers.security.PasswordUtils;
 import com.uma.southdevelopers.service.UserService;
+import com.uma.southdevelopers.service.exceptions.UserNotFoundException;
 import com.uma.southdevelopers.service.exceptions.WrongCredentialsException;
-import io.jsonwebtoken.Jwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -14,16 +14,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
 
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -40,18 +39,7 @@ public class UserController {
     @Value(value="${local.server.host}")
     private String host;
 
-    private String uri(String scheme, String host, int port, String ...paths) {
-        UriBuilderFactory ubf = new DefaultUriBuilderFactory();
-        UriBuilder ub = ubf.builder()
-                .scheme(scheme)
-                .host(host).port(port);
-        for (String path: paths) {
-            ub = ub.path(path);
-        }
-        return ub.build().toString();
-    }
-
-    private URI uri2(String scheme, String host, int port, String ...paths) {
+    private URI uri(String scheme, String host, int port, String ...paths) {
         UriBuilderFactory ubf = new DefaultUriBuilderFactory();
         UriBuilder ub = ubf.builder()
                 .scheme(scheme)
@@ -63,7 +51,7 @@ public class UserController {
     }
 
     private <T> RequestEntity<T> post(String scheme, String host, int port, String path, T object) {
-        URI uri = uri2(scheme, host,port, path);
+        URI uri = uri(scheme, host,port, path);
         var peticion = RequestEntity.post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(object);
@@ -76,13 +64,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
         Optional<User> optionalUser = userService.getUserById(id);
-        if(!optionalUser.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(optionalUser.isEmpty()) {
+            return ResponseEntity.status(404).body("El usuario no existe");
         }
-        User user = optionalUser.get();
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return ResponseEntity.ok(UserDTO.fromUser(optionalUser.get()));
     }
     
 
@@ -95,41 +82,38 @@ public class UserController {
         String password = PasswordUtils.createPassword();
         user.setPassword(password);
         User savedUser = userService.createUser(user);
-        return ResponseEntity.ok(uri("http", host, port, "/usuarios/"+savedUser.getUserId()));
+        return ResponseEntity.created(uri("http", host, port, "/usuarios/"+savedUser.getUserId())).build();
     }
 
     @PostMapping("/passwordreset")
     public ResponseEntity<String> resetPassword(@RequestBody PasswordresetDTO pssDTO){
         Optional<String> newPassword = userService.resetPassword(pssDTO.getEmail());
-        if(newPassword.isEmpty()) { // TODO: No seria negado o la salida no debería ser no ok? <Jay>
+        if(newPassword.isEmpty()) {
             return ResponseEntity.ok().build();
         }
-        // TODO: enviar contraseña por correo
-
-        List<String> medios = new ArrayList<>();
-        medios.add("EMAIL");
         var notiDTO = NotificationDTO.builder()
                 .emailDestino(pssDTO.getEmail())
                 .cuerpo(newPassword.get())
                 .asunto("Restablecer contraseña")
-                .medios(medios)
+                .programacionEnvio(new Date().toString())
+                .tipoDeNotificacion("PASSWORD_RESET")
+                .medios(List.of("EMAIL"))
                 .build();
-        var peticion = post("http",host,port,"/notification",notiDTO); //TODO: el host habría que cambiarlo
+        var peticion = post("http", host, port,"/notification", notiDTO);
+        // new RestTemplate().exchange(peticion, Void.class);
         return  ResponseEntity.ok(newPassword.get()); // TODO: devolvemos contraseña para las pruebas, quitar.
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        User updatedUser = userService.updateUser(id, user);
-        if(updatedUser == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+        User updatedUser = userService.updateUser(id, userDTO.user());
+        return new ResponseEntity<>(UserDTO.fromUser(updatedUser), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/login")
@@ -144,6 +128,11 @@ public class UserController {
     @ExceptionHandler(WrongCredentialsException.class)
     public ResponseEntity<?> badCredentials(){
         return ResponseEntity.status(403).body("Credenciales no correctas");
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<?> userNotFound(){
+        return ResponseEntity.status(404).body("El usuario no existe");
     }
 }
 
