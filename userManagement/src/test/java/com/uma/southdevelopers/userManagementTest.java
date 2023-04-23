@@ -157,6 +157,7 @@ public class userManagementTest {
             //Comprobamos los parametros
             compruebaCampos(usuariosBD.get(0),userDTO.user()); //Por que da fallo con el id ????????????
         }
+
     }
 
     @Nested
@@ -303,6 +304,35 @@ public class userManagementTest {
 
             compruebaCampos(user1,respuesta.getBody().get(0).user());
             compruebaCampos(user2,respuesta.getBody().get(1).user());
+        }
+
+        @Test
+        @DisplayName("Delete de usuario")
+        public void deleteUsuario(){
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+
+            User user2 = new User();
+            user2.setUserId(Long.valueOf(2));
+            user2.setName("Pepe");
+            user2.setSurname1("Garcia");
+            user2.setSurname2("Garcia");
+            user2.setEmail("pepegg@gmail.com");
+            user2.setPassword("password");
+
+            userRepo.save(user1);
+            userRepo.save(user2);
+
+            var peticion = delete("http", host, port,"/usuarios/1");
+            var respuesta = restTemplate.exchange(peticion,Void.class);
+            assertThat(respuesta.getStatusCode()).isEqualTo(200);
+
+            assertThat(userRepo.existsById(Long.valueOf(1))).isFalse();
         }
     }
 

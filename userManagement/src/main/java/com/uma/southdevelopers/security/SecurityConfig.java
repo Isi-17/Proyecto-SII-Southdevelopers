@@ -82,6 +82,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,"/usuarios/id")
                 .permitAll()
                 .requestMatchers(HttpMethod.POST,"/usuarios")
+                .permitAll()
+                .requestMatchers(HttpMethod.DELETE,"/usuarios")
                 .permitAll();
         return http.build();
     }
