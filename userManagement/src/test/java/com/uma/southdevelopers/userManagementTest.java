@@ -103,7 +103,6 @@ public class userManagementTest {
     @Nested
     @DisplayName("Con la Base de Datos Vacia")
     public class BaseDeDatosVacia {
-
         @Test
         @DisplayName("Acceder a un usuario concreto")
         public void errorConUsuarioConcreto() {
@@ -333,6 +332,44 @@ public class userManagementTest {
             assertThat(respuesta.getStatusCode()).isEqualTo(200);
 
             assertThat(userRepo.existsById(Long.valueOf(1))).isFalse();
+        }
+
+        @Test
+        @DisplayName("Update de usuario")
+        public void updateUsuario(){
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+
+            User user2 = new User();
+            user2.setUserId(Long.valueOf(2));
+            user2.setName("Pepe");
+            user2.setSurname1("Garcia");
+            user2.setSurname2("Garcia");
+            user2.setEmail("pepegg@gmail.com");
+            user2.setPassword("password");
+
+            userRepo.save(user1);
+            userRepo.save(user2);
+
+            UserDTO userDTO = UserDTO.fromUser(user1);
+            userDTO.setNombre("JuanNuevo");
+            userDTO.setApellido1("SanchezNuevo");
+            userDTO.setApellido2("SanchezNuevo");
+            userDTO.setEmail("juanssNUEVO@gmail.com");
+
+            var peticion = put("http", host, port,"/usuarios/1",userDTO);
+            var respuesta = restTemplate.exchange(peticion,
+                    new ParameterizedTypeReference<UserDTO>() {});
+
+            assertThat(respuesta.getStatusCode()).isEqualTo(200);
+
+            compruebaCampos(respuesta.getBody().user(), userDTO.user());
+            compruebaCampos(userRepo.findById(Long.valueOf(1)).get(),userDTO.user());
         }
     }
 
