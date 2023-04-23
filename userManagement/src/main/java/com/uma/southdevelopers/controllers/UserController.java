@@ -33,9 +33,6 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
     private JwtUtil jwtUtil;
 
     @Value(value="${local.server.port}")
@@ -43,11 +40,6 @@ public class UserController {
 
     @Value(value="${local.server.host}")
     private String host;
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
 
     private URI uri(String scheme, String host, int port, String ...paths) {
         UriBuilderFactory ubf = new DefaultUriBuilderFactory();
