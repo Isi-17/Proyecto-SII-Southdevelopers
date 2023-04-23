@@ -2,7 +2,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.uma.southdevelopers.dto.UserDTO;
 import com.uma.southdevelopers.entities.User;
@@ -83,12 +85,21 @@ public class userManagementTest {
                 .body(object);
         return peticion;
     }
+
+    private void compruebaCampos(User user, UserDTO userDTO){
+        assertThat(user.getUserId()).isEqualTo(userDTO.getId());
+        assertThat(user.getName()).isEqualTo(userDTO.getNombre());
+        assertThat(user.getSurname1()).isEqualTo(userDTO.getApellido1());
+        assertThat(user.getSurname2()).isEqualTo(userDTO.getApellido2());
+        assertThat(user.getEmail()).isEqualTo(userDTO.getEmail());
+    }
+
     @Nested
     @DisplayName("Con la Base de Datos Vacia")
     public class BaseDeDatosVacia {
 
         @Test
-        @DisplayName("devuelve error al acceder a un usuario concreto")
+        @DisplayName("Acceder a un usuario concreto")
         public void errorConUsuarioConcreto() {
             var peticion = get("http", host, port, "/usuarios/1");
 
@@ -98,7 +109,7 @@ public class userManagementTest {
             assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
         }
         @Test
-        @DisplayName("devuelve una lista vacía de usuarios")
+        @DisplayName("Lista vacía de usuarios")
         public void devuelveListaVaciaUsuarios() {
             var peticion = get("http", host, port, "/usuarios");
 
@@ -110,7 +121,7 @@ public class userManagementTest {
         }
 
         @Test
-        @DisplayName("inserta correctamente un usuario")
+        @DisplayName("Inserta un usuario")
         public void insertaUsuario() {
 
             // Preparamos el usuario a insertar
@@ -137,17 +148,56 @@ public class userManagementTest {
             assertThat(respuesta.getHeaders().get("Location").get(0))
                     .endsWith("/"+usuariosBD.get(0).getUserId());
 
-            assertThat(usuariosBD.get(0).getUserId()).isEqualTo(userDTO.getId());
-            assertThat(usuariosBD.get(0).getName()).isEqualTo(userDTO.getNombre());
-            assertThat(usuariosBD.get(0).getSurname1()).isEqualTo(userDTO.getApellido1());
-            assertThat(usuariosBD.get(0).getSurname2()).isEqualTo(userDTO.getApellido2());
-            assertThat(usuariosBD.get(0).getEmail()).isEqualTo(userDTO.getEmail());
+            //Comprobamos los parametros
+            compruebaCampos(usuariosBD.get(0),userDTO);
         }
     }
 
     @Nested
     @DisplayName("Con Datos en la Base de Datos")
     public class BaseDeDatosNoVacia{
+        @Test
+        @DisplayName("Crear usuario")
+        public void crearUsuario(){
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+            Set<User.Role> roles = new HashSet<>();
+            roles.add(User.Role.CORRECTOR);
+            user1.setRoles(roles);
 
+            userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
+
+            var userDTO = UserDTO.builder()
+                    .id(66667777)
+                    .nombre("Paco")
+                    .apellido1("Garcia")
+                    .apellido2("Garcia")
+                    .email("pepegg@gmail.com")
+                    .build();
+
+            // Preparamos la petición con el usuario dentro
+            var peticion = post("http", host, port, "/usuarios", userDTO);
+
+            // Invocamos al servicio REST
+            var respuesta = restTemplate.exchange(peticion,Void.class);
+
+            // Comprobamos el resultado
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
+            assertThat(respuesta.getHeaders().get("Location").get(0))
+                    .startsWith("http://localhost:"+port+"/usuarios");
+
+            List<User> usuariosBD = userRepo.findAll();
+            assertThat(usuariosBD).hasSize(2);
+            assertThat(respuesta.getHeaders().get("Location").get(0))
+                    .endsWith("/"+usuariosBD.get(1).getUserId());
+
+            //Comprobamos los parametros
+            compruebaCampos(usuariosBD.get(1),userDTO);
+        }
     }
 }
