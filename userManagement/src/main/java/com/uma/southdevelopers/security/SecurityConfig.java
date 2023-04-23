@@ -79,7 +79,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/usuarios")
                 .permitAll()
-                .requestMatchers("/usuarios/id")
+                .requestMatchers(HttpMethod.GET,"/usuarios/id")
                 .permitAll()
                 .requestMatchers(HttpMethod.POST,"/usuarios")
                 .permitAll();

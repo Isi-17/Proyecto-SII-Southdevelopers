@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.convert.DataSizeUnit;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -91,12 +92,12 @@ public class userManagementTest {
         return peticion;
     }
 
-    private void compruebaCampos(User user, UserDTO userDTO){
-        assertThat(user.getUserId()).isEqualTo(userDTO.getId());
-        assertThat(user.getName()).isEqualTo(userDTO.getNombre());
-        assertThat(user.getSurname1()).isEqualTo(userDTO.getApellido1());
-        assertThat(user.getSurname2()).isEqualTo(userDTO.getApellido2());
-        assertThat(user.getEmail()).isEqualTo(userDTO.getEmail());
+    private void compruebaCampos(User user, User user2){
+        assertThat(user.getUserId()).isEqualTo(user2.getUserId());
+        assertThat(user.getName()).isEqualTo(user2.getName());
+        assertThat(user.getSurname1()).isEqualTo(user2.getSurname1());
+        assertThat(user.getSurname2()).isEqualTo(user2.getSurname2());
+        assertThat(user.getEmail()).isEqualTo(user2.getEmail());
     }
 
     @Nested
@@ -154,7 +155,7 @@ public class userManagementTest {
                     .endsWith("/"+usuariosBD.get(0).getUserId());
 
             //Comprobamos los parametros
-            //compruebaCampos(usuariosBD.get(0),userDTO);
+            compruebaCampos(usuariosBD.get(0),userDTO.user()); //Por que da fallo con el id ????????????
         }
     }
 
@@ -178,7 +179,7 @@ public class userManagementTest {
             userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
 
             var userDTO = UserDTO.builder()
-                    .id(66667777)
+                    .id(Long.valueOf(66667777))
                     .nombre("Paco")
                     .apellido1("Garcia")
                     .apellido2("Garcia")
@@ -202,13 +203,46 @@ public class userManagementTest {
                     .endsWith("/"+usuariosBD.get(1).getUserId());
 
             //Comprobamos los parametros
-            compruebaCampos(usuariosBD.get(1),userDTO);
+            compruebaCampos(usuariosBD.get(1),userDTO.user()); //Por que da fallo con el id ????????????
         }
 
         @Test
-        @DisplayName("Crear usuario  existente")
-        public void crearUsuarioExistente(){
+        @DisplayName("Crear usuario con un email existente")
+        public void crearUsuarioExistenteEmail(){
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+            Set<User.Role> roles = new HashSet<>();
+            roles.add(User.Role.CORRECTOR);
+            user1.setRoles(roles);
 
+            userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
+
+            //Tratemos de crear un usuario con el mismo email
+            var userDTO = UserDTO.builder()
+                    .id(Long.valueOf(66667777))
+                    .nombre("Paco")
+                    .apellido1("Garcia")
+                    .apellido2("Garcia")
+                    .email("juanss@gmail.com")
+                    .build();
+
+            var peticion = post("http", host, port, "/usuarios", userDTO);
+
+            // Invocamos al servicio REST
+            var respuesta = restTemplate.exchange(peticion,Void.class);
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(409);
+        }
+
+        @Test
+        @DisplayName("Acceder a usuario existente")
+        public void accederUsuarioExistente(){
+            
         }
     }
 
