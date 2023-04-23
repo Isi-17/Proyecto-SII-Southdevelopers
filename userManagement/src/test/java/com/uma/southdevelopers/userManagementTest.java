@@ -4,10 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.uma.southdevelopers.dto.NotificationDTO;
 import com.uma.southdevelopers.dto.UserDTO;
 import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.repositories.UserRepository;
@@ -22,15 +25,25 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
+
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @DisplayName("Tests de userManagement")
@@ -579,10 +592,10 @@ public class userManagementTest {
         }
 
     }
-    
+
     @Nested
-    @DisplayName("Test de Seguridad")
-    public class SecurityTests {
+    @DisplayName("Test de Password Reset")
+    public class PasswordResetTests {
         //     @Test
         //     @DisplayName("Resetear contraseña con email correcto")
         //     public void passwordResetOK() throws Exception {
@@ -597,6 +610,11 @@ public class userManagementTest {
         //         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         //     }
         // }
+    }
+    @Nested
+    @DisplayName("Test Acceso&Token")
+    public class AccesoTokenTests{
+
         @Test
         @DisplayName("Acceso a /usuarios sin token")
         public void accesoUsuariosSinToken() {
@@ -642,7 +660,111 @@ public class userManagementTest {
         public void accesoRecursoSinAutenticacion(){
            
         }
+
+        // Este test no funciona porque no se puede inyectar el MockMvc
+        // @Autowired
+        // private MockMvc mockMvc;
+
+        //     @Test
+        // @WithMockUser(username = "admin", roles = "ADMIN")
+        // public void testAdminAccessToAdminResource() throws Exception {
+        //     mockMvc.perform(get("/admin-resource"))
+        //         .andExpect(status().isOk());
+        // }
+
+        // @Test
+        // @WithMockUser(username = "user", roles = "USER")
+        // public void testUserAccessToAdminResource() throws Exception {
+        //     mockMvc.perform(get("/admin-resource"))
+        //             .andExpect(status().isForbidden());
+        // }
+
+        // @Test
+        // public void testAccessToUnsecuredResource() throws Exception {
+        //     mockMvc.perform(get("/unsecured-resource"))
+        //             .andExpect(status().isOk());
+        // }
+
+        // @Test
+        // public void testAccessToSecuredResourceWithoutAuthentication() throws Exception {
+        //     mockMvc.perform(get("/secured-resource"))
+        //             .andExpect(status().isUnauthorized());
+        // }
+
+        // @Test
+        // public void testAccessToSecuredResourceWithAuthentication() throws Exception {
+        //     String token = getToken("user", "password");
+
+        //     mockMvc.perform(get("/secured-resource")
+        //             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+        //             .andExpect(status().isOk());
+        // }
+
+        // private String getToken(String username, String password) throws Exception {
+        //     AuthenticationRequest authenticationRequest = new AuthenticationRequest();
+        //     authenticationRequest.setUsername(username);
+        //     authenticationRequest.setPassword(password);
+
+        //     MvcResult result = mockMvc.perform(post("/authenticate")
+        //             .contentType(MediaType.APPLICATION_JSON)
+        //             .content(objectMapper.writeValueAsString(authenticationRequest)))
+        //             .andReturn();
+
+        //     String tokenJson = result.getResponse().getContentAsString();
+        //     Map<String, String> map = objectMapper.readValue(tokenJson, new TypeReference<Map<String, String>>() {});
+
+        //     return map.get("token");
+        // }
     }
 
+    @Nested
+    @DisplayName("Test de Notificaciones")
+    public class NotificacionesTests {
+        @Autowired
+        private MockMvc mockMvc;
+
+        @Test
+        @DisplayName("Envio de notificacion exitoso")
+        public void enviarNotificacionExitoso() throws Exception {
+            NotificationDTO notificacion = NotificationDTO.builder()
+                    .asunto("Prueba de notificación")
+                    .cuerpo("Esta es una prueba de notificación")
+                    .emailDestino("destinatario@ejemplo.com")
+                    .telefonoDestino("+34666666666")
+                    .programacionEnvio("2023-04-25T10:30:00Z")
+                    .medios(Arrays.asList("email", "sms"))
+                    .tipoDeNotificacion("importante")
+                    .build();
+    
+             // Me daba fallos el objeto objectMapper
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(notificacion);
+
+            ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/notification")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(notificacion))
+            );
+    
+            result.andExpect(status().isOk());
+        }
+    
+        @Test
+        @DisplayName("Envío de notificación sin datos requeridos")
+        public void enviarNotificacionSinDatos() throws Exception {
+            NotificationDTO notificacion = NotificationDTO.builder().build();
+    
+            // Me daba fallos el objeto objectMapper
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(notificacion);
+
+            ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/notification")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(notificacion))
+            );
+    
+            result.andExpect(status().isBadRequest());
+        }
+
+    }
 
 }
