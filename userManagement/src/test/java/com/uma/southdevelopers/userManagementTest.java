@@ -579,4 +579,70 @@ public class userManagementTest {
         }
 
     }
+    
+    @Nested
+    @DisplayName("Test de Seguridad")
+    public class SecurityTests {
+        //     @Test
+        //     @DisplayName("Resetear contraseña con email correcto")
+        //     public void passwordResetOK() throws Exception {
+            
+        //         String email = "juanss@gmail.com";
+        //         HttpHeaders headers = new HttpHeaders();
+        //         headers.setContentType(MediaType.APPLICATION_JSON);
+        //         var request = new HttpEntity<>("{\"email\":\"" + email + "\"}", headers);
+                
+        //         var response = restTemplate.postForEntity("/usuarios/passwordreset", request, String.class);
+                
+        //         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        //     }
+        // }
+        @Test
+        @DisplayName("Acceso a /usuarios sin token")
+        public void accesoUsuariosSinToken() {
+            var request = get("http", host, port, "/usuarios");
+            var response = restTemplate.exchange(request, new ParameterizedTypeReference<List<UserDTO>>() {});
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        }
+
+        @Test
+        @DisplayName("Acceso a /usuarios con token")
+        public void accesoUsuariosConToken(){
+
+        }
+
+        // @Test
+        // @DisplayName("Acceso a /usuarios/{id} sin token")
+        // public void accesoUsuarioSinTokenID() {
+        //     var request = get("http", host, port, "/usuarios/1");
+        //     var response = restTemplate.exchange(request, new ParameterizedTypeReference<UserDTO>() {});
+        //     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        // }
+
+        // @Test
+        // @DisplayName("Acceso a /usuarios/{id} con token")
+        // public void accesoUsuarioConTokenID(){
+
+        // }
+
+        @Test
+        @DisplayName("Acceso a /usuarios/{id} con token de otro usuario")
+        public void accesoUsuarioConTokenDeOtroUsuario(){
+        
+        }
+
+        // @Test
+        // @DisplayName("Acceso a /usuarios/{id} con token de otro usuario")
+        // public void accesoUsuarioConTokenDeOtroUsuarioID(){
+        
+        // }
+
+        @Test
+        @DisplayName("Acceso a un recurso sin autenticación")
+        public void accesoRecursoSinAutenticacion(){
+           
+        }
+    }
+
+
 }
