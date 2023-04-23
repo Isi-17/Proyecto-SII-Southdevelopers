@@ -447,7 +447,7 @@ public class StudentManegementApplicationTests {
                     .id(1L)
                     .build();
 
-            var peticionPost = post("http", "localhost", port, "/localhost", instituto1);
+            var peticionPost = post("http", "localhost", port, "/institutos", instituto1);
 
             var respuestaPost1 = restTemplate.exchange(peticionPost, Void.class);
 
@@ -456,7 +456,7 @@ public class StudentManegementApplicationTests {
                     .id(1L)
                     .build();
 
-            var peticionPost2 = post("http", "localhost", port, "/localhost", instituto2);
+            var peticionPost2 = post("http", "localhost", port, "/institutos", instituto2);
 
             var respuestaPost2 = restTemplate.exchange(peticionPost, Void.class);
 

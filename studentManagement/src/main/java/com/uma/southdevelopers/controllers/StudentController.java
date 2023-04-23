@@ -56,6 +56,7 @@ public class StudentController {
                 .toUri();
     }
 
+
     @GetMapping
     public List<StudentDTO> obtainStudents(@RequestParam(value = "idSede", required = false) Long idSede,
                                               @RequestParam(value = "idConvocatoria", required = false) Long idConvocatoria) {
