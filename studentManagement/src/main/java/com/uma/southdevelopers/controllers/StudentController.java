@@ -5,11 +5,13 @@ import com.uma.southdevelopers.dtos.ImportacionEstudiantesDTO;
 import com.uma.southdevelopers.dtos.NewStudentDTO;
 
 import com.uma.southdevelopers.dtos.StudentDTO;
+import com.uma.southdevelopers.entities.Enrolment;
 import com.uma.southdevelopers.entities.Subject;
 import com.uma.southdevelopers.entities.Institute;
 import com.uma.southdevelopers.entities.Student;
 import com.uma.southdevelopers.service.InstituteDBService;
 import com.uma.southdevelopers.service.MateriaDBService;
+import com.uma.southdevelopers.service.MatriculasDBService;
 import com.uma.southdevelopers.service.StudentDBService;
 import com.uma.southdevelopers.service.exceptions.EntityDoNotDeleteException;
 import com.uma.southdevelopers.service.exceptions.EntityNotFoundException;
@@ -37,12 +39,16 @@ public class StudentController {
     public InstituteDBService serviceInstitute;
     public MateriaDBService serviceMateria;
 
+    public MatriculasDBService serviceMatriculas;
+
     public StudentController(StudentDBService service,
                              InstituteDBService serviceInstitute,
-                             MateriaDBService serviceMateria) {
+                             MateriaDBService serviceMateria,
+                             MatriculasDBService serviceMatriculas) {
         this.service = service;
         this.serviceInstitute = serviceInstitute;
         this.serviceMateria = serviceMateria;
+        this.serviceMatriculas = serviceMatriculas;
     }
 
     public static Function<Long, URI> studentUriBuilder(UriComponents uriBuilder) {
@@ -53,10 +59,12 @@ public class StudentController {
     }
 
     @GetMapping
-    public List<NewStudentDTO> obtainStudents(@RequestParam(value = "idSede", required = false) Long idSede, UriComponentsBuilder uriBuilder) {
+    public List<NewStudentDTO> obtainStudents(@RequestParam(value = "idSede", required = false) Long idSede,
+                                              @RequestParam(value = "idConvocatoria", required = false) Long idConvocatoria,
+                                              UriComponentsBuilder uriBuilder) {
         var students = (idSede==null) ? service.allStudents() : service.obtainStudentFromSede(idSede);
         Function<Student, NewStudentDTO> mapper = (p ->
-                NewStudentDTO.fromStudent(p, studentUriBuilder(uriBuilder.build())));
+                NewStudentDTO.fromStudent(p, idConvocatoria, studentUriBuilder(uriBuilder.build())));
         return students.stream()
                 .map(mapper)
                 .toList();
@@ -78,8 +86,15 @@ public class StudentController {
                 throw new EntityNotFoundException();
             }
         }
+        List<Enrolment> matriculas = new ArrayList<>();
+        Enrolment matricula = new Enrolment();
+        matricula.setIdConvocatoria(2023L);
+        matricula.setMateriasMatriculadas(materias);
+        matriculas.add(matricula);
 
-        Student stud = student.student(institute, materias);
+        serviceMatriculas.addMatriculas(matricula);
+
+        Student stud = student.student(institute, matriculas);
 
         Long id = service.addStudent(stud);
 
@@ -88,9 +103,9 @@ public class StudentController {
 
     @GetMapping("/{id}")
     @ResponseStatus(code=HttpStatus.OK)
-    public NewStudentDTO obtainStudent(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
+    public StudentDTO obtainStudent(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
         Student student = service.obtainStudent(id);
-        return NewStudentDTO.fromStudent(student,
+        return StudentDTO.fromStudent(student, 2023L,
                 studentUriBuilder(uriBuilder.build()));
     }
 
@@ -102,16 +117,25 @@ public class StudentController {
         List<Subject> materias = new ArrayList<>();
         List<Long> materiasFromStudentDTO = student.getMateriasMatriculadas();
 
-        for(int i = 0; i < materiasFromStudentDTO.size(); i++) {
+        for (int i = 0; i < materiasFromStudentDTO.size(); i++) {
             Optional<Subject> materia = serviceMateria.obtainMateria(materiasFromStudentDTO.get(i));
             if (materia.isPresent()) {
                 materias.add(materia.get());
+                System.out.println(materia.get());
             } else {
                 throw new EntityNotFoundException();
             }
         }
 
-        Student entidadStudent = student.student(institute, materias);
+        List<Enrolment> matriculas = new ArrayList<>();
+        Enrolment matricula = new Enrolment();
+        matricula.setIdConvocatoria(2023L);
+        matricula.setMateriasMatriculadas(materias);
+        matriculas.add(matricula);
+
+        serviceMatriculas.addMatriculas(matricula);
+
+        Student entidadStudent = student.student(institute, matriculas);
         entidadStudent.setId(id);
         service.updateStudent(entidadStudent);
         return entidadStudent.toDTO();
@@ -150,24 +174,33 @@ public class StudentController {
                 List<Subject> subjects = new ArrayList<>();
                 for(int j = 0; j < materias.length; j++) {
                     Optional<Subject> enrolment = serviceMateria.obtainMateria(materias[j]);
-                    if(!enrolment.isPresent()) {
+                    if (!enrolment.isPresent()) {
                         serviceMateria.addEnrolment(new Subject(0L, materias[j], true));
                     }
                     enrolment = serviceMateria.obtainMateria(materias[j]);
                     subjects.add(enrolment.get());
 
                 }
-                student.setMatriculas(subjects);
+
+                List<Enrolment> matriculas = new ArrayList<>();
+
+                Enrolment matricula = new Enrolment();
+                matricula.setIdConvocatoria(2023L);
+                matricula.setMateriasMatriculadas(subjects);
+
+                matriculas.add(matricula);
+
+                student.setMatriculas(matriculas);
 
                 service.addStudent(student);
                 importacionEstudiantesDTO.addStudent(student.toDTO());
 
                 // Codigo para parar la importacion
                 // COMENTAR PARA IMPORTAR TODOS LOS REGISTROS
-                /*i ++;
+                i ++;
                 if(i == 10){
                     break;
-                }*/
+                }
 
             }
 

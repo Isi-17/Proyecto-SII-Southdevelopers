@@ -32,12 +32,25 @@ public class Student {
 
     public StudentDTO toDTO(){
 
+        for(Enrolment enrolment: matriculas) {
+            if(enrolment.getIdConvocatoria() == 2023L) {
+                return new StudentDTO(this.Id,
+                        new CompleteNameDTO(this.nombre, this.apellido1, this.apellido2),
+                        this.dni,
+                        this.telefono,
+                        this.email,
+                        enrolment.getMateriasMatriculadas(),
+                        this.idSede,
+                        this.instituto,
+                        this.noEliminar);
+            }
+        }
         return new StudentDTO(this.Id,
                 new CompleteNameDTO(this.nombre, this.apellido1, this.apellido2),
                 this.dni,
                 this.telefono,
                 this.email,
-                this.matriculas,
+                null,
                 this.idSede,
                 this.instituto,
                 this.noEliminar);
