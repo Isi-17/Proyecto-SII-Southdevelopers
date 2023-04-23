@@ -662,34 +662,42 @@ public class userManagementTest {
         }
 
         // Este test no funciona porque no se puede inyectar el MockMvc
-        // @Autowired
-        // private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-        //     @Test
-        // @WithMockUser(username = "admin", roles = "ADMIN")
-        // public void testAdminAccessToAdminResource() throws Exception {
-        //     mockMvc.perform(get("/admin-resource"))
-        //         .andExpect(status().isOk());
-        // }
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        @DisplayName("Acceso del admin a un recurso protegido")
+        public void testAdminAccessToAdminResource() throws Exception {
+            mockMvc.perform(MockMvcRequestBuilders.get("/admin-resource")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        }
 
-        // @Test
-        // @WithMockUser(username = "user", roles = "USER")
-        // public void testUserAccessToAdminResource() throws Exception {
-        //     mockMvc.perform(get("/admin-resource"))
-        //             .andExpect(status().isForbidden());
-        // }
+        @Test
+        @WithMockUser(username = "user", roles = "USER")
+        @DisplayName("Acceso de usuario no autorizado a un recurso protegido")
+        public void testUserAccessToAdminResource() throws Exception {
+            mockMvc.perform(MockMvcRequestBuilders.get("/admin-resource")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+        }
 
-        // @Test
-        // public void testAccessToUnsecuredResource() throws Exception {
-        //     mockMvc.perform(get("/unsecured-resource"))
-        //             .andExpect(status().isOk());
-        // }
+        @Test
+        @DisplayName("Acceso a un recurso no protegido")
+        public void testAccessToUnsecuredResource() throws Exception {
+            mockMvc.perform(MockMvcRequestBuilders.get("/unsecured-resource")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        }
 
-        // @Test
-        // public void testAccessToSecuredResourceWithoutAuthentication() throws Exception {
-        //     mockMvc.perform(get("/secured-resource"))
-        //             .andExpect(status().isUnauthorized());
-        // }
+        @Test
+        @DisplayName("Acceso a un recurso protegido sin autenticación")
+        public void testAccessToSecuredResourceWithoutAuthentication() throws Exception {
+            mockMvc.perform(MockMvcRequestBuilders.get("/secured-resource")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+        }
 
         // @Test
         // public void testAccessToSecuredResourceWithAuthentication() throws Exception {
