@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static java.lang.Boolean.TRUE;
+
 @Service
 @Transactional
 public class InstituteDBService {
@@ -49,6 +51,11 @@ public class InstituteDBService {
         } else {
             throw new EntityNotFoundException();
         }
+    }
+
+    public Boolean checkInstitute(String name) {
+        var institute = instituteRepository.findByNombre(name);
+        return (institute.isPresent());
     }
 
     public void updateInstitute(Institute institute) {

@@ -35,6 +35,11 @@ public class MateriaDBService {
         return enrolmentRepository.findByNombre(name);
     }
 
+    public Boolean checkMateria(String name) {
+        var materia = enrolmentRepository.findByNombre(name);
+        return (materia.isPresent());
+    }
+
     public Optional<Subject> obtainMateria(Long id) {
         return enrolmentRepository.findById(id);
     }

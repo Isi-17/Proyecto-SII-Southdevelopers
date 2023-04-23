@@ -23,7 +23,7 @@ public class Student {
     private String dni;
     private String telefono;
     private String email;
-    @ManyToMany
+    @OneToMany(cascade = {CascadeType.ALL})
     private List<Enrolment> matriculas;
     private Long idSede;
     @OneToOne

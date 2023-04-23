@@ -1,10 +1,8 @@
 package com.uma.southdevelopers.controllers;
 
 
-import com.uma.southdevelopers.dtos.ImportacionEstudiantesDTO;
-import com.uma.southdevelopers.dtos.NewStudentDTO;
+import com.uma.southdevelopers.dtos.*;
 
-import com.uma.southdevelopers.dtos.StudentDTO;
 import com.uma.southdevelopers.entities.Enrolment;
 import com.uma.southdevelopers.entities.Subject;
 import com.uma.southdevelopers.entities.Institute;
@@ -59,12 +57,14 @@ public class StudentController {
     }
 
     @GetMapping
-    public List<NewStudentDTO> obtainStudents(@RequestParam(value = "idSede", required = false) Long idSede,
+    public List<StudentDTO> obtainStudents(@RequestParam(value = "idSede", required = false) Long idSede,
                                               @RequestParam(value = "idConvocatoria", required = false) Long idConvocatoria,
                                               UriComponentsBuilder uriBuilder) {
+        Long convocatoria = (idConvocatoria==null) ? 2023L : idConvocatoria;
+
         var students = (idSede==null) ? service.allStudents() : service.obtainStudentFromSede(idSede);
-        Function<Student, NewStudentDTO> mapper = (p ->
-                NewStudentDTO.fromStudent(p, idConvocatoria, studentUriBuilder(uriBuilder.build())));
+        Function<Student, StudentDTO> mapper = (p ->
+                StudentDTO.fromStudent(p, convocatoria, studentUriBuilder(uriBuilder.build())));
         return students.stream()
                 .map(mapper)
                 .toList();
@@ -157,50 +157,106 @@ public class StudentController {
              CSVParser csvParser = new CSVParser(fileReader,
                      CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader());) {
 
-            List<Student> tutorials = new ArrayList<Student>();
             Iterable<CSVRecord> csvRecords = csvParser.getRecords();
 
             int i = 0;
             for (CSVRecord csvRecord : csvRecords) {
-                Student student = new Student();
-                student.setNombre(csvRecord.get("Nombre"));
-                student.setApellido1(csvRecord.get("Apellido1"));
-                student.setApellido2(csvRecord.get("Apellido2"));
-                student.setDni(csvRecord.get("DNI/NIF"));
-                Institute institute = serviceInstitute.obtainInstitute(csvRecord.get("CENTRO"));
-                student.setInstituto(institute);
 
-                String[] materias = csvRecord.get("DETALLE_MATERIAS").split(",");
-                List<Subject> subjects = new ArrayList<>();
-                for(int j = 0; j < materias.length; j++) {
-                    Optional<Subject> enrolment = serviceMateria.obtainMateria(materias[j]);
-                    if (!enrolment.isPresent()) {
-                        serviceMateria.addEnrolment(new Subject(0L, materias[j], true));
+
+                String[] checkMaterias = csvRecord.get("DETALLE_MATERIAS").split(",");
+                Boolean existenTodasLasAsignaturas = true;
+
+                for (int j = 0; j < checkMaterias.length; j++) {
+                    Optional<Subject> enrolment = serviceMateria.obtainMateria(checkMaterias[j].trim());
+                    if (enrolment.isEmpty()) {
+                        existenTodasLasAsignaturas = false;
                     }
-                    enrolment = serviceMateria.obtainMateria(materias[j]);
-                    subjects.add(enrolment.get());
-
                 }
 
-                List<Enrolment> matriculas = new ArrayList<>();
+                if(serviceInstitute.checkInstitute(csvRecord.get("CENTRO")) && !service.checkStudent(csvRecord.get("DNI/NIF"))
+                        && existenTodasLasAsignaturas) {
+                    Student student = new Student();
+                    student.setNombre(csvRecord.get("Nombre"));
+                    student.setApellido1(csvRecord.get("Apellido1"));
+                    student.setApellido2(csvRecord.get("Apellido2"));
+                    student.setDni(csvRecord.get("DNI/NIF"));
+                    Institute institute = serviceInstitute.obtainInstitute(csvRecord.get("CENTRO"));
+                    student.setInstituto(institute);
 
-                Enrolment matricula = new Enrolment();
-                matricula.setIdConvocatoria(2023L);
-                matricula.setMateriasMatriculadas(subjects);
+                    String[] materias = csvRecord.get("DETALLE_MATERIAS").split(",");
+                    List<Subject> subjects = new ArrayList<>();
+                    for (int j = 0; j < materias.length; j++) {
+                        Optional<Subject> enrolment = serviceMateria.obtainMateria(materias[j].trim());
+                        if (enrolment.isPresent()) {
+                            enrolment = serviceMateria.obtainMateria(materias[j].trim());
+                            subjects.add(enrolment.get());
+                        }
+                    }
 
-                matriculas.add(matricula);
+                    List<Enrolment> matriculas = new ArrayList<>();
 
-                student.setMatriculas(matriculas);
+                    Enrolment matricula = new Enrolment();
+                    matricula.setIdConvocatoria(2023L);
+                    matricula.setMateriasMatriculadas(subjects);
 
-                service.addStudent(student);
-                importacionEstudiantesDTO.addStudent(student.toDTO());
+                    matriculas.add(matricula);
+
+                    student.setMatriculas(matriculas);
+
+                    service.addStudent(student);
+                    importacionEstudiantesDTO.addStudent(student.toDTO());
+                } else {
+                    StudentDTO student = new StudentDTO();
+                    ProblemaImportacionDTO problemaImportacionDTO = new ProblemaImportacionDTO();
+                    problemaImportacionDTO.setProblemaImportacion("Errores: ");
+
+                    CompleteNameDTO completeNameDTO = new CompleteNameDTO();
+                    completeNameDTO.setNombre(csvRecord.get("Nombre"));
+                    completeNameDTO.setApellido1(csvRecord.get("Apellido1"));
+                    completeNameDTO.setApellido2(csvRecord.get("Apellido2"));
+                    student.setNombreCompleto(completeNameDTO);
+
+                    if(service.checkStudent(csvRecord.get("DNI/NIF"))) {
+                        student.setDni(csvRecord.get("DNI/NIF"));
+                        problemaImportacionDTO.setProblemaImportacion(problemaImportacionDTO.getProblemaImportacion() + " Ya hay un estudiante con el mismo dni,");
+                    } else {
+                        student.setDni(csvRecord.get("DNI/NIF"));
+                    }
+
+                    if(!serviceInstitute.checkInstitute(csvRecord.get("CENTRO"))) {
+                        problemaImportacionDTO.setProblemaImportacion(problemaImportacionDTO.getProblemaImportacion() + " No existe el instituto,");
+                        student.setInstituto(null);
+                    } else {
+                        Institute institute = serviceInstitute.obtainInstitute(csvRecord.get("CENTRO"));
+                        student.setInstituto(institute);
+                    }
+
+                    String[] materias = csvRecord.get("DETALLE_MATERIAS").split(",");
+                    List<Subject> subjects = new ArrayList<>();
+
+                    for(int j = 0; j < materias.length; j++) {
+                        if (serviceMateria.checkMateria(materias[j].trim())) {
+                            Optional<Subject> subject = serviceMateria.obtainMateria(materias[j].trim());
+                            subjects.add(subject.get());
+                        } else {
+                            problemaImportacionDTO.setProblemaImportacion(problemaImportacionDTO.getProblemaImportacion() + " No existe la materia " + materias[j] + ",");
+                        }
+
+                    }
+
+                    student.setMateriasMatriculadas(subjects);
+
+                    problemaImportacionDTO.setEstudiante(student);
+
+                    importacionEstudiantesDTO.addProblem(problemaImportacionDTO);
+                }
 
                 // Codigo para parar la importacion
                 // COMENTAR PARA IMPORTAR TODOS LOS REGISTROS
-                i ++;
-                if(i == 10){
+                /*i ++;
+                if(i == 40){
                     break;
-                }
+                }*/
 
             }
 

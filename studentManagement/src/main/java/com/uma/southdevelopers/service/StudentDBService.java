@@ -73,6 +73,11 @@ public class StudentDBService {
         }
     }
 
+    public Boolean checkStudent(String dni) {
+        var student = studentRepository.findByDni(dni);
+        return (student.isPresent());
+    }
+
     public void updateStudent(Student student) {
         if (studentRepository.existsById(student.getId())) {
             var studentOptional = studentRepository.findByDni(student.getDni());
