@@ -226,6 +226,7 @@ public class userManagementTest {
             user.setSurname2("Sanchez");
             user.setEmail("juanss@gmail.com");
             user.setPassword("password");
+            // ROL USUARIO
             // Set<User.Role> roles = new HashSet<>();
             // roles.add(User.Role.CORRECTOR);
             // user.setRoles(roles);
@@ -272,6 +273,7 @@ public class userManagementTest {
             user.setSurname2("Sanchez");
             user.setEmail("juanss@gmail.com");
             user.setPassword("password");
+            // ROL USUARIO
             // Set<User.Role> roles = new HashSet<>();
             // roles.add(User.Role.CORRECTOR);
             // user.setRoles(roles);
