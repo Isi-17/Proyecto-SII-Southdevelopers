@@ -7,14 +7,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.uma.southdevelopers.dto.NotificationDTO;
 import com.uma.southdevelopers.dto.UserDTO;
 import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.repositories.UserRepository;
-import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
