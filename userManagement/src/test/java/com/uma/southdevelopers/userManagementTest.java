@@ -282,7 +282,7 @@ public class userManagementTest {
             user1.setPassword("password");
 
             User user2 = new User();
-            user2.setUserId(Long.valueOf(1));
+            user2.setUserId(Long.valueOf(2));
             user2.setName("Pepe");
             user2.setSurname1("Garcia");
             user2.setSurname2("Garcia");
@@ -292,7 +292,7 @@ public class userManagementTest {
             userRepo.save(user1);
             userRepo.save(user2);
 
-            
+
             var peticion = get("http", host, port, "/usuarios");
 
             var respuesta = restTemplate.exchange(peticion,
@@ -300,6 +300,9 @@ public class userManagementTest {
 
             assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
             assertThat(respuesta.getBody()).hasSize(2);
+
+            compruebaCampos(user1,respuesta.getBody().get(0).user());
+            compruebaCampos(user2,respuesta.getBody().get(1).user());
         }
     }
 
