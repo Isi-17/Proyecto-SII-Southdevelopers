@@ -1,3 +1,5 @@
+package com.uma.southdevelopers;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
