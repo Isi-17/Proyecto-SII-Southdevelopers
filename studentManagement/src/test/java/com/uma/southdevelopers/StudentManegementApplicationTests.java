@@ -3,6 +3,7 @@ package com.uma.southdevelopers;
 import com.uma.southdevelopers.dtos.InstituteDTO;
 import com.uma.southdevelopers.dtos.NewStudentDTO;
 import com.uma.southdevelopers.dtos.CompleteNameDTO;
+import com.uma.southdevelopers.dtos.StudentDTO;
 import com.uma.southdevelopers.entities.Subject;
 import org.junit.jupiter.api.Nested;
 import org.springframework.core.ParameterizedTypeReference;
@@ -16,12 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -109,52 +113,120 @@ public class StudentManegementApplicationTests {
     }
 
     @Nested
-    @DisplayName("cuando la base de datos está vacía")
+    @DisplayName("Cuando la base de datos está vacía")
     public class EmptyDataBase {
 
-        @Test
-        @DisplayName("devuelve error al acceder a un estudiante concreto")
-        public void errorConEstudianteConcreto() {
-            var peticion = get("http", "localhost", port, "/localhost/1");
 
-            var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<NewStudentDTO>() {});
+        @Nested
+        @DisplayName("Pruebas para los metodos get con un id")
+        public class getId {
+            @Test
+            @DisplayName("Devuelve error 404 al acceder a un estudiante concreto")
+            public void errorConEstudianteConcreto() {
+                var peticion = get("http", "localhost", port, "/estudiantes/1");
 
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+                var respuesta = restTemplate.exchange(peticion,
+                        new ParameterizedTypeReference<List<StudentDTO>>() {});
+
+                assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+            }
+
+            @Test
+            @DisplayName("Devuelve error 404 al acceder a un instituto concreto")
+            public void errorConInstitutoConcreto() {
+                var peticion = get("http", "localhost", port, "/institutos/1");
+
+                var respuesta = restTemplate.exchange(peticion,
+                        new ParameterizedTypeReference<List<InstituteDTO>>() {});
+
+                assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+            }
         }
 
-        @Test
-        @DisplayName("devuelve error al acceder a un instituto concreto")
-        public void errorConInstitutoConcreto() {
-            var peticion = get("http", "localhost", port, "/localhost/1");
 
-            var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<InstituteDTO>() {});
+        @Nested
+        @DisplayName("Pruebas para los metodos get")
+        public class get {
+            @Test
+            @DisplayName("Devuelve una lista vacía de estudiantes")
+            public void devuelveListaVaciaEstudiantes(){
+                var peticion = get("http", "localhost", port, "/estudiantes");
 
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+                var respuesta = restTemplate.exchange(peticion,
+                        new ParameterizedTypeReference<List<StudentDTO>>() {});
+
+                assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+                assertThat(respuesta.getBody()).isEmpty();
+            }
+
+            @Test
+            @DisplayName("Devuelve una lista vacía de estudiantes con idSede")
+            public void devuelveListaVaciaEstudiantesConIdSede(){
+
+
+                Institute instituto = new Institute();
+                instituto.setNombre("IES");
+                instituto.setId(1L);
+
+                restTemplate.exchange(post("http", "localhost", port, "/institutos",
+                        instituto), Void.class);
+
+                Subject materia = new Subject();
+                materia.setNombre("Matematicas");
+                materia.setId(1L);
+
+                restTemplate.exchange(post("http", "localhost", port, "/materias",
+                        materia), Void.class);
+
+                CompleteNameDTO cn = new CompleteNameDTO();
+                cn.setNombre("Jesus");
+                cn.setApellido1("Escudero");
+                cn.setApellido2("Moreno");
+
+                var estudiante = NewStudentDTO.builder()
+                        .id(1L)
+                        .materiasMatriculadas(List.of(1L))
+                        .idInstituto(1L)
+                        .nombreCompleto(cn)
+                        .idSede(0L)
+                        .build();
+
+                var peticion = post("http", "localhost", port, "/estudiantes",
+                        estudiante);
+
+                var respuesta = restTemplate.exchange(peticion, Void.class);
+
+
+                // Crea la URL base del endpoint
+                String baseUrl = "http://localhost:"+port+"/estudiantes";
+
+                // Crea la instancia de UriComponentsBuilder y agrega los parámetros necesarios
+                UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(baseUrl)
+                        .queryParam("idSede", 0);
+
+                // Obtén la URL final con los parámetros
+                String url = builder.toUriString();
+
+                // Haz la petición REST utilizando la URL construida
+                ResponseEntity<List<StudentDTO>> response = restTemplate.exchange(url, HttpMethod.GET, null,
+                        new ParameterizedTypeReference<List<StudentDTO>>() {});
+
+                assertThat(response.getStatusCode().value()).isEqualTo(200);
+                assertThat(response.getBody()).isEmpty();
+            }
+
+            @Test
+            @DisplayName("Devuelve una lista vacía de institutos")
+            public void devuelveListaVaciaInstitutos(){
+                var peticion = get("http", "localhost", port, "/institutos");
+                var respuesta = restTemplate.exchange(peticion,
+                        new ParameterizedTypeReference<List<InstituteDTO>>() {});
+                assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+                assertThat(respuesta.getBody()).isEmpty();
+            }
+
         }
 
-        @Test
-        @DisplayName("devuelve una lista vacía de estudiantes")
-        public void devuelveListaVaciaEstudiantes(){
-            var peticion = get("http", "localhost", port, "/estudiantes");
-
-            var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<List<NewStudentDTO>>() {});
-
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-            assertThat(respuesta.getBody()).isEmpty();
-        }
-
-        @Test
-        @DisplayName("devuelve una lista vacía de institutos")
-        public void devuelveListaVaciaInstitutos(){
-            var peticion = get("http", "localhost", port, "/institutos");
-            var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<List<InstituteDTO>>() {});
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-            assertThat(respuesta.getBody()).isEmpty();
-        }
 
         @Test
         @DisplayName("inserta correctamente un estudiante")
