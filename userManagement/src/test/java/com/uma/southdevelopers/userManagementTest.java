@@ -217,7 +217,7 @@ public class userManagementTest {
     public class LoginTests{
         @Test
         @DisplayName("Iniciar sesión con credenciales correctas")
-        public void iniciarSesionConCredencialesCorrectas() {
+        public void loginOK() {
             // Creamos el usuario en la base de datos
             User user = new User();
             user.setUserId(Long.valueOf(1));
@@ -248,7 +248,7 @@ public class userManagementTest {
 
         @Test
         @DisplayName("Iniciar sesión con usuario no registrado")
-        public void iniciarSesionConUsuarioNoRegistrado() {
+        public void loginNotRegistered() {
 
             UserDTO credentials = UserDTO.builder()
                     .nombre("username")
@@ -264,7 +264,7 @@ public class userManagementTest {
 
         @Test
         @DisplayName("Iniciar sesión con contraseña incorrecta")
-        public void iniciarSesionConContraseñaIncorrecta() {
+        public void loginWrongPassword() {
 
             User user = new User();
             user.setUserId(Long.valueOf(1));
