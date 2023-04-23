@@ -110,7 +110,7 @@ public class userManagementTest {
             var peticion = get("http", host, port, "/usuarios/1");
 
             var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<User>() {});
+                    new ParameterizedTypeReference<UserDTO>() {});
 
             assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
         }
@@ -242,7 +242,64 @@ public class userManagementTest {
         @Test
         @DisplayName("Acceder a usuario existente")
         public void accederUsuarioExistente(){
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+            Set<User.Role> roles = new HashSet<>();
+            roles.add(User.Role.CORRECTOR);
+            user1.setRoles(roles);
+
+            userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
+
+            var peticion = get("http", host, port, "/usuarios/1");
+
+            var respuesta = restTemplate.exchange(peticion,
+                    new ParameterizedTypeReference<UserDTO>() {});
+
+            // Comprobamos el resultado
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
+            assertThat(respuesta.getHeaders().get("Location").get(0))
+                    .startsWith("http://localhost:"+port+"/usuarios");
+
+            UserDTO userDTORespuesta = respuesta.getBody();
+
+            compruebaCampos(user1,userDTORespuesta.user());
+        }
+
+        @Test
+        @DisplayName("Acceder a lista de usuarios")
+        public void accederListaUsuarios(){
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+
+            User user2 = new User();
+            user2.setUserId(Long.valueOf(1));
+            user2.setName("Pepe");
+            user2.setSurname1("Garcia");
+            user2.setSurname2("Garcia");
+            user2.setEmail("pepegg@gmail.com");
+            user2.setPassword("password");
+
+            userRepo.save(user1);
+            userRepo.save(user2);
+
             
+            var peticion = get("http", host, port, "/usuarios");
+
+            var respuesta = restTemplate.exchange(peticion,
+                    new ParameterizedTypeReference<List<UserDTO>>() {});
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+            assertThat(respuesta.getBody()).hasSize(2);
         }
     }
 
