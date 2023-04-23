@@ -305,6 +305,33 @@ public class userManagementTest {
         }
 
         @Test
+        @DisplayName("Acceder a usuario no existente")
+        public void accederUsuarioNoExistente(){
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+            Set<User.Role> roles = new HashSet<>();
+            roles.add(User.Role.CORRECTOR);
+            user1.setRoles(roles);
+
+            userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
+
+            var peticion = get("http", host, port, "/usuarios/2");
+
+            var respuesta = restTemplate.exchange(peticion,
+                    new ParameterizedTypeReference<UserDTO>() {});
+
+            // Comprobamos el resultado
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+            assertThat(respuesta.getHeaders().get("Location").get(0))
+                    .startsWith("http://localhost:"+port+"/usuarios");
+        }
+
+        @Test
         @DisplayName("Acceder a lista de usuarios")
         public void accederListaUsuarios(){
             User user1 = new User();
