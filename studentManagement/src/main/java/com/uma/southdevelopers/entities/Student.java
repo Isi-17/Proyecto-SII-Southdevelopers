@@ -30,10 +30,10 @@ public class Student {
     private Institute instituto;
     private boolean noEliminar;
 
-    public StudentDTO toDTO(){
+    public StudentDTO toDTO(Long idConvocatoria){
 
         for(Enrolment enrolment: matriculas) {
-            if(enrolment.getIdConvocatoria() == 2023L) {
+            if(enrolment.getIdConvocatoria().equals(idConvocatoria)) {
                 return new StudentDTO(this.Id,
                         new CompleteNameDTO(this.nombre, this.apellido1, this.apellido2),
                         this.dni,

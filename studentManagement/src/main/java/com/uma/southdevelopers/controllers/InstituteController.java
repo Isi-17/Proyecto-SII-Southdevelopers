@@ -38,17 +38,17 @@ public class InstituteController {
     }
 
     @GetMapping
-    public List<InstituteDTO> obtainInstitutes(UriComponentsBuilder uriBuilder) {
+    public List<InstituteDTO> obtainInstitutes() {
         var institutes = service.allInstitutes();
         Function<Institute, InstituteDTO> mapper = (p ->
-                InstituteDTO.fromInstitute(p,
-                        instituteUriBuilder(uriBuilder.build())));
+                InstituteDTO.fromInstitute(p));
         return institutes.stream()
                 .map(mapper)
                 .toList();
     }
 
     @PostMapping
+    @ResponseStatus(code=HttpStatus.CREATED)
     public Institute addInstitute(@RequestBody InstituteDTO institute, UriComponentsBuilder uriBuilder) {
         Institute inst = institute.institute();
         Long id = service.addInstitute(inst);
@@ -60,8 +60,7 @@ public class InstituteController {
     @ResponseStatus(code=HttpStatus.OK)
     public InstituteDTO obtainInstitute(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
         Institute institute = service.obtainInstitute(id);
-        return InstituteDTO.fromInstitute(institute,
-                instituteUriBuilder(uriBuilder.build()));
+        return InstituteDTO.fromInstitute(institute);
     }
 
     @PutMapping("/{id}")

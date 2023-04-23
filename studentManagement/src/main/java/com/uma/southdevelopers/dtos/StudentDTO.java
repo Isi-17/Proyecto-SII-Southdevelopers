@@ -28,8 +28,7 @@ public class StudentDTO {
     private Institute instituto;
     private boolean noEliminar;
 
-    public static StudentDTO fromStudent(Student student, Long idConvocatoria,
-                                            Function<Long, URI> studentUriBuilder) {
+    public static StudentDTO fromStudent(Student student, Long idConvocatoria) {
         var dto = new StudentDTO();
 
         dto.setId(student.getId());

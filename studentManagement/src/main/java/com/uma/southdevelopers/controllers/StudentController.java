@@ -58,16 +58,21 @@ public class StudentController {
 
     @GetMapping
     public List<StudentDTO> obtainStudents(@RequestParam(value = "idSede", required = false) Long idSede,
-                                              @RequestParam(value = "idConvocatoria", required = false) Long idConvocatoria,
-                                              UriComponentsBuilder uriBuilder) {
+                                              @RequestParam(value = "idConvocatoria", required = false) Long idConvocatoria) {
         Long convocatoria = (idConvocatoria==null) ? 2023L : idConvocatoria;
 
         var students = (idSede==null) ? service.allStudents() : service.obtainStudentFromSede(idSede);
-        Function<Student, StudentDTO> mapper = (p ->
-                StudentDTO.fromStudent(p, convocatoria, studentUriBuilder(uriBuilder.build())));
-        return students.stream()
-                .map(mapper)
-                .toList();
+
+        List<StudentDTO> studentDTOS = new ArrayList<>();
+
+        for(Student student : students) {
+            StudentDTO studentDTO = student.toDTO(convocatoria);
+            if (studentDTO.getMateriasMatriculadas() != null) {
+                studentDTOS.add(studentDTO);
+            }
+        }
+
+        return studentDTOS;
     }
 
     @PostMapping
@@ -98,15 +103,14 @@ public class StudentController {
 
         Long id = service.addStudent(stud);
 
-        return stud.toDTO();
+        return stud.toDTO(2023L);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(code=HttpStatus.OK)
     public StudentDTO obtainStudent(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
         Student student = service.obtainStudent(id);
-        return StudentDTO.fromStudent(student, 2023L,
-                studentUriBuilder(uriBuilder.build()));
+        return StudentDTO.fromStudent(student, 2023L);
     }
 
     @PutMapping("/{id}")
@@ -121,7 +125,6 @@ public class StudentController {
             Optional<Subject> materia = serviceMateria.obtainMateria(materiasFromStudentDTO.get(i));
             if (materia.isPresent()) {
                 materias.add(materia.get());
-                System.out.println(materia.get());
             } else {
                 throw new EntityNotFoundException();
             }
@@ -138,7 +141,7 @@ public class StudentController {
         Student entidadStudent = student.student(institute, matriculas);
         entidadStudent.setId(id);
         service.updateStudent(entidadStudent);
-        return entidadStudent.toDTO();
+        return entidadStudent.toDTO(2023L);
     }
 
     @DeleteMapping("/{id}")
@@ -204,7 +207,7 @@ public class StudentController {
                     student.setMatriculas(matriculas);
 
                     service.addStudent(student);
-                    importacionEstudiantesDTO.addStudent(student.toDTO());
+                    importacionEstudiantesDTO.addStudent(student.toDTO(2023L));
                 } else {
                     StudentDTO student = new StudentDTO();
                     ProblemaImportacionDTO problemaImportacionDTO = new ProblemaImportacionDTO();

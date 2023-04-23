@@ -21,11 +21,9 @@ public class InstituteDTO {
     private String localidad;
     private Integer codigoPostal;
     private String pais;
-    @JsonProperty("_links")
-    private Links links;
 
-    public static InstituteDTO fromInstitute(Institute institute,
-                                             Function<Long, URI> instituteUriBuilder) {
+
+    public static InstituteDTO fromInstitute(Institute institute) {
         var dto = new InstituteDTO();
 
         dto.setId(institute.getId());
@@ -35,9 +33,6 @@ public class InstituteDTO {
         dto.setLocalidad(institute.getLocalidad());
         dto.setCodigoPostal(institute.getCodigoPostal());
         dto.setPais(institute.getPais());
-        dto.setLinks(Links.builder()
-                .self(instituteUriBuilder.apply(institute.getId()))
-                .build());
 
         return dto;
     }
