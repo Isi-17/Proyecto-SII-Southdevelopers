@@ -28,11 +28,9 @@ public class NewStudentDTO {
     private Long idSede;
     private Long idInstituto;
     private boolean noEliminar;
-    @JsonProperty("_links")
-    private Links links;
 
-    public static NewStudentDTO fromStudent(Student student, Long idConvocatoria,
-                                            Function<Long, URI> studentUriBuilder) {
+
+    public static NewStudentDTO fromStudent(Student student, Long idConvocatoria) {
         var dto = new NewStudentDTO();
 
         dto.setId(student.getId());
@@ -58,9 +56,6 @@ public class NewStudentDTO {
         dto.setIdSede(student.getIdSede());
         dto.setIdInstituto(student.getInstituto().getId());
         dto.setNoEliminar(student.isNoEliminar());
-        dto.setLinks(Links.builder()
-                .self(studentUriBuilder.apply(student.getId()))
-                .build());
 
         return dto;
     }
