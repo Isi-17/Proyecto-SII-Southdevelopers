@@ -213,7 +213,7 @@ public class userManagementTest {
     }
 
     @Nested
-    @DisplayName("Con Datos en la Base de Datos")
+    @DisplayName("Test de Login")
     public class LoginTests{
         @Test
         @DisplayName("Iniciar sesión con credenciales correctas")
@@ -231,7 +231,6 @@ public class userManagementTest {
             // user.setRoles(roles);
 
             userRepo.save(user);
-
 
             UserDTO credentials = UserDTO.builder()
                     .nombre("Juan")
@@ -279,7 +278,6 @@ public class userManagementTest {
 
             userRepo.save(user);
 
-
             UserDTO credentials = UserDTO.builder()
                     .nombre("Juan")
                     .apellido1("wrong_password")
@@ -291,6 +289,5 @@ public class userManagementTest {
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         }
 
-        
     }
 }
