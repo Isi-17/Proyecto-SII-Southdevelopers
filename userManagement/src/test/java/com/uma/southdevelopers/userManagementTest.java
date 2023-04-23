@@ -201,5 +201,11 @@ public class userManagementTest {
             //Comprobamos los parametros
             compruebaCampos(usuariosBD.get(1),userDTO);
         }
+
+        @Test
+        @DisplayName("Crear usuario  existente")
+        public void crearUsuarioExistente(){
+
+        }
     }
 }
