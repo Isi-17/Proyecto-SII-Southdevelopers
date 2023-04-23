@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.test.annotation.DirtiesContext;
@@ -209,5 +210,87 @@ public class userManagementTest {
         public void crearUsuarioExistente(){
 
         }
+    }
+
+    @Nested
+    @DisplayName("Con Datos en la Base de Datos")
+    public class LoginTests{
+        @Test
+        @DisplayName("Iniciar sesión con credenciales correctas")
+        public void iniciarSesionConCredencialesCorrectas() {
+            // Creamos el usuario en la base de datos
+            User user = new User();
+            user.setUserId(Long.valueOf(1));
+            user.setName("Juan");
+            user.setSurname1("Sanchez");
+            user.setSurname2("Sanchez");
+            user.setEmail("juanss@gmail.com");
+            user.setPassword("password");
+            // Set<User.Role> roles = new HashSet<>();
+            // roles.add(User.Role.CORRECTOR);
+            // user.setRoles(roles);
+
+            userRepo.save(user);
+
+
+            UserDTO credentials = UserDTO.builder()
+                    .nombre("Juan")
+                    .apellido1("password")
+                    .build();
+                    
+            var request = post("http", host, port, "/login", credentials);
+            var response = restTemplate.exchange(request, String.class);
+
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody()).contains("accessToken");
+        }
+
+        @Test
+        @DisplayName("Iniciar sesión con usuario no registrado")
+        public void iniciarSesionConUsuarioNoRegistrado() {
+
+            UserDTO credentials = UserDTO.builder()
+                    .nombre("username")
+                    .apellido1("password")
+                    .build();
+            
+            var request = post("http", host, port, "/login", credentials);
+
+            var response = restTemplate.exchange(request, String.class);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        }
+
+        @Test
+        @DisplayName("Iniciar sesión con contraseña incorrecta")
+        public void iniciarSesionConContraseñaIncorrecta() {
+
+            User user = new User();
+            user.setUserId(Long.valueOf(1));
+            user.setName("Juan");
+            user.setSurname1("Sanchez");
+            user.setSurname2("Sanchez");
+            user.setEmail("juanss@gmail.com");
+            user.setPassword("password");
+            // Set<User.Role> roles = new HashSet<>();
+            // roles.add(User.Role.CORRECTOR);
+            // user.setRoles(roles);
+
+            userRepo.save(user);
+
+
+            UserDTO credentials = UserDTO.builder()
+                    .nombre("Juan")
+                    .apellido1("wrong_password")
+                    .build();
+            
+            var request = post("http", host, port, "/login", credentials);
+            var response = restTemplate.exchange(request, String.class);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        }
+
+        
     }
 }
