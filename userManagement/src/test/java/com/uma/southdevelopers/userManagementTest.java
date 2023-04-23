@@ -157,6 +157,40 @@ public class userManagementTest {
             compruebaCampos(usuariosBD.get(0),userDTO.user()); //Por que da fallo con el id ????????????
         }
 
+        @Test
+        @DisplayName("Delete de usuario")
+        public void deleteUsuarioNoExiste(){
+            var peticion = delete("http", host, port,"/usuarios/3");
+            var respuesta = restTemplate.exchange(peticion,Void.class);
+            assertThat(respuesta.getStatusCode()).isEqualTo(404);
+        }
+
+        @Test
+        @DisplayName("Update de usuario que no existe")
+        public void updateUsuarioNoExiste(){
+
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+
+            UserDTO userDTO = UserDTO.fromUser(user1);
+            userDTO.setNombre("JuanNuevo");
+            userDTO.setApellido1("SanchezNuevo");
+            userDTO.setApellido2("SanchezNuevo");
+            userDTO.setEmail("juanssNUEVO@gmail.com");
+
+            var peticion = put("http", host, port,"/usuarios/3",userDTO);
+            var respuesta = restTemplate.exchange(peticion,
+                    new ParameterizedTypeReference<UserDTO>() {});
+
+            assertThat(respuesta.getStatusCode()).isEqualTo(404);
+
+        }
+
     }
 
     @Nested
@@ -335,6 +369,35 @@ public class userManagementTest {
         }
 
         @Test
+        @DisplayName("Delete de usuario que no existe")
+        public void deleteUsuarioNoExiste(){
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+
+            User user2 = new User();
+            user2.setUserId(Long.valueOf(2));
+            user2.setName("Pepe");
+            user2.setSurname1("Garcia");
+            user2.setSurname2("Garcia");
+            user2.setEmail("pepegg@gmail.com");
+            user2.setPassword("password");
+
+            userRepo.save(user1);
+            userRepo.save(user2);
+
+            var peticion = delete("http", host, port,"/usuarios/3");
+            var respuesta = restTemplate.exchange(peticion,Void.class);
+            assertThat(respuesta.getStatusCode()).isEqualTo(404);
+
+            assertThat(userRepo.findAll()).hasSize(2);
+        }
+
+        @Test
         @DisplayName("Update de usuario")
         public void updateUsuario(){
             User user1 = new User();
@@ -370,6 +433,42 @@ public class userManagementTest {
 
             compruebaCampos(respuesta.getBody().user(), userDTO.user());
             compruebaCampos(userRepo.findById(Long.valueOf(1)).get(),userDTO.user());
+        }
+
+        @Test
+        @DisplayName("Update de usuario que no existe")
+        public void updateUsuarioNoExiste(){
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+
+            User user2 = new User();
+            user2.setUserId(Long.valueOf(2));
+            user2.setName("Pepe");
+            user2.setSurname1("Garcia");
+            user2.setSurname2("Garcia");
+            user2.setEmail("pepegg@gmail.com");
+            user2.setPassword("password");
+
+            userRepo.save(user1);
+            userRepo.save(user2);
+
+            UserDTO userDTO = UserDTO.fromUser(user1);
+            userDTO.setNombre("JuanNuevo");
+            userDTO.setApellido1("SanchezNuevo");
+            userDTO.setApellido2("SanchezNuevo");
+            userDTO.setEmail("juanssNUEVO@gmail.com");
+
+            var peticion = put("http", host, port,"/usuarios/3",userDTO);
+            var respuesta = restTemplate.exchange(peticion,
+                    new ParameterizedTypeReference<UserDTO>() {});
+
+            assertThat(respuesta.getStatusCode()).isEqualTo(404);
+
         }
     }
 
