@@ -144,4 +144,10 @@ public class userManagementTest {
             assertThat(usuariosBD.get(0).getEmail()).isEqualTo(userDTO.getEmail());
         }
     }
+
+    @Nested
+    @DisplayName("Con Datos en la Base de Datos")
+    public class BaseDeDatosNoVacia{
+
+    }
 }
