@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Date;
@@ -34,12 +35,6 @@ public class UserController {
 
     @Autowired
     private JwtUtil jwtUtil;
-
-    @Value(value="${local.server.port}")
-    private int port;
-
-    @Value(value="${local.server.host}")
-    private String host;
 
     private URI uri(String scheme, String host, int port, String ...paths) {
         UriBuilderFactory ubf = new DefaultUriBuilderFactory();
@@ -76,7 +71,7 @@ public class UserController {
     
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody UserDTO userDto) {
+    public ResponseEntity<?> createUser(@RequestBody UserDTO userDto, UriComponentsBuilder uriComponentsBuilder) {
         if(userService.existUserWithEmail(userDto.getEmail())){
             return ResponseEntity.status(409).body("Hay un usuario con el mismo correo electrónico en el sistema");
         }
@@ -84,7 +79,12 @@ public class UserController {
         String password = PasswordUtils.createPassword();
         user.setPassword(password);
         User savedUser = userService.createUser(user);
-        return ResponseEntity.created(uri("http", host, port, "/usuarios/"+savedUser.getUserId())).build();
+        return ResponseEntity.created(
+                uriComponentsBuilder.path("/usuarios")
+                .path(String.format("/%d", savedUser.getUserId()))
+                .build()
+                .toUri()
+        ).build();
     }
 
     @PostMapping("/passwordreset")

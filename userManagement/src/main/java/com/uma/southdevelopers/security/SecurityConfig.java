@@ -39,20 +39,22 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/usuarios/login")
                 .permitAll()
-                .requestMatchers(HttpMethod.POST, "/usuarios") // TODO: sin autorizacion para las pruebas, pedir autorizacion
-                .permitAll()
                 .requestMatchers(HttpMethod.POST,"/usuarios/passwordreset")
                 .permitAll()
-//		        .requestMatchers(HttpMethod.GET, "/usuarios/**")
-//                .hasAnyRole("ROLE_RESPONSABLE_AULA","ROLE_VIGILANTE_AULA", "RESPONSABLE_AULA","VIGILANTE_AULA",
-//                        "VICERRECTORADO", "ROLE_VICERRECTORADO", "ROLE_CORRECTOR", "CORRECTOR")
-//                .requestMatchers(HttpMethod.PUT, "/usuarios/**")
-//                .hasAnyRole("VICERRECTORADO", "ROLE_VICERRECTORADO")
-//                .requestMatchers(HttpMethod.DELETE, "/usuarios/**")
-//                .hasAnyRole("VICERRECTORADO", "ROLE_VICERRECTORADO")
-//                .requestMatchers(HttpMethod.GET, "/usuarios")
-//                .hasAnyRole("ROLE_RESPONSABLE_AULA","ROLE_VIGILANTE_AULA", "RESPONSABLE_AULA","VIGILANTE_AULA",
-//                        "VICERRECTORADO", "ROLE_VICERRECTORADO", "ROLE_CORRECTOR", "CORRECTOR")
+//                .requestMatchers(HttpMethod.POST, "/usuarios") // TODO: sin autorizacion para las pruebas, pedir autorizacion
+//                .permitAll()
+                .requestMatchers(HttpMethod.POST, "/usuarios")
+                .hasAnyRole("VICERRECTORADO", "ROLE_VICERRECTORADO")
+		        .requestMatchers(HttpMethod.GET, "/usuarios/**")
+                .hasAnyRole("ROLE_RESPONSABLE_AULA","ROLE_VIGILANTE_AULA", "RESPONSABLE_AULA","VIGILANTE_AULA",
+                        "VICERRECTORADO", "ROLE_VICERRECTORADO", "ROLE_CORRECTOR", "CORRECTOR")
+                .requestMatchers(HttpMethod.PUT, "/usuarios/**")
+                .hasAnyRole("VICERRECTORADO", "ROLE_VICERRECTORADO")
+                .requestMatchers(HttpMethod.DELETE, "/usuarios/**")
+                .hasAnyRole("VICERRECTORADO", "ROLE_VICERRECTORADO")
+                .requestMatchers(HttpMethod.GET, "/usuarios")
+                .hasAnyRole("ROLE_RESPONSABLE_AULA","ROLE_VIGILANTE_AULA", "RESPONSABLE_AULA","VIGILANTE_AULA",
+                        "VICERRECTORADO", "ROLE_VICERRECTORADO", "ROLE_CORRECTOR", "CORRECTOR")
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -66,24 +68,4 @@ public class SecurityConfig {
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
-    @Bean
-    public SecurityFilterChain filterChainDisabled(HttpSecurity http) throws Exception {
-        http
-                .cors()
-                .and()
-                .csrf()
-                .disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/usuarios")
-                .permitAll()
-                .requestMatchers(HttpMethod.GET,"/usuarios/id")
-                .permitAll()
-                .requestMatchers(HttpMethod.POST,"/usuarios")
-                .permitAll()
-                .requestMatchers(HttpMethod.DELETE,"/usuarios")
-                .permitAll();
-        return http.build();
-    }
-
 }

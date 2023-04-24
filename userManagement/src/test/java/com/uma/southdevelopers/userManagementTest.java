@@ -13,6 +13,8 @@ import com.uma.southdevelopers.dto.NotificationDTO;
 import com.uma.southdevelopers.dto.UserDTO;
 import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.repositories.UserRepository;
+import com.uma.southdevelopers.security.JwtUtil;
+import com.uma.southdevelopers.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,7 +45,7 @@ import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
 
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DisplayName("Tests de userManagement")
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class userManagementTest {
@@ -54,11 +56,16 @@ public class userManagementTest {
     @Value(value="${local.server.port}")
     private int port;
 
-    @Value(value="${local.server.host}")
-    private String host;
+    private String host = "localhost";
 
     @Autowired
     private UserRepository userRepo;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private UserService userService;
 
     private URI uri(String scheme, String host, int port, String ...paths) {
         UriBuilderFactory ubf = new DefaultUriBuilderFactory();
@@ -94,6 +101,15 @@ public class userManagementTest {
         return peticion;
     }
 
+    private <T> RequestEntity<T> postJwt(String scheme, String host, int port, String path, T object, String jwt) {
+        URI uri = uri(scheme, host,port, path);
+        var peticion = RequestEntity.post(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer "+jwt)
+                .body(object);
+        return peticion;
+    }
+
     private <T> RequestEntity<T> put(String scheme, String host, int port, String path, T object) {
         URI uri = uri(scheme, host,port, path);
         var peticion = RequestEntity.put(uri)
@@ -108,6 +124,20 @@ public class userManagementTest {
         assertThat(user.getSurname1()).isEqualTo(user2.getSurname1());
         assertThat(user.getSurname2()).isEqualTo(user2.getSurname2());
         assertThat(user.getEmail()).isEqualTo(user2.getEmail());
+    }
+
+    private String crearUsuarioVicerrectorado() {
+        var vicerrector = User.builder().name("vicerrector")
+                .password("1234").email("vice@mail.es").roles(Set.of(User.Role.VICERRECTORADO)).build();
+        userRepo.save(vicerrector);
+        return jwtUtil.generateToken(userService.loadUserByUsername("vice@mail.es"));
+    }
+
+    private String crearUsuarioCorrector() {
+        var corrector = User.builder().name("corrector")
+                .password("1234").email("corrector@mail.es").roles(Set.of(User.Role.CORRECTOR)).build();
+        userRepo.save(corrector);
+        return jwtUtil.generateToken(userService.loadUserByUsername("corrector@mail.es"));
     }
 
     @Nested
@@ -607,121 +637,40 @@ public class userManagementTest {
                 
                 assertThat(response.getStatusCode()).isEqualTo(200);
             }
+
+    }
+
+    @Nested
+    @DisplayName("Creación de usuarios")
+    public class userCreation {
+        @Test
+        @DisplayName("Usuario creado correctamente (201)")
+        public void correctUserCreation(){
+            var userDTO = UserDTO.builder()
+                    .nombre("usuario1")
+                    .apellido1("apellido1")
+                    .apellido2("apellido2")
+                    .email("usuario@email.es")
+                    .build();
+
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = postJwt("http", host, port, "/usuarios", userDTO, jwt);
+            var respuesta = restTemplate.exchange(peticion, Void.class);
+
+            var maybeUser = userRepo.findByEmail("usuario@email.es");
+
+            assertThat(maybeUser).isNotEmpty();
+
+            var user = maybeUser.get();
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
+
+            assertThat(respuesta.getHeaders().get("Location").get(0))
+                    .startsWith("http://localhost:"+port+"/usuarios");
+
+            assertThat(respuesta.getHeaders().get("Location").get(0))
+                    .endsWith("/"+user.getUserId());
         }
-    
-    // @Nested
-    // @DisplayName("Test Acceso&Token")
-    // public class AccesoTokenTests{
-
-    //     @Test
-    //     @DisplayName("Acceso a /usuarios sin token")
-    //     public void accesoUsuariosSinToken() {
-    //         var request = get("http", host, port, "/usuarios");
-    //         var response = restTemplate.exchange(request, new ParameterizedTypeReference<List<UserDTO>>() {});
-    //         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    //     }
-
-    //     @Test
-    //     @DisplayName("Acceso a /usuarios con token")
-    //     public void accesoUsuariosConToken(){
-
-    //     }
-
-    //     // @Test
-    //     // @DisplayName("Acceso a /usuarios/{id} sin token")
-    //     // public void accesoUsuarioSinTokenID() {
-    //     //     var request = get("http", host, port, "/usuarios/1");
-    //     //     var response = restTemplate.exchange(request, new ParameterizedTypeReference<UserDTO>() {});
-    //     //     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    //     // }
-
-    //     // @Test
-    //     // @DisplayName("Acceso a /usuarios/{id} con token")
-    //     // public void accesoUsuarioConTokenID(){
-
-    //     // }
-
-    //     @Test
-    //     @DisplayName("Acceso a /usuarios/{id} con token de otro usuario")
-    //     public void accesoUsuarioConTokenDeOtroUsuario(){
-        
-    //     }
-
-    //     // @Test
-    //     // @DisplayName("Acceso a /usuarios/{id} con token de otro usuario")
-    //     // public void accesoUsuarioConTokenDeOtroUsuarioID(){
-        
-    //     // }
-
-    //     @Test
-    //     @DisplayName("Acceso a un recurso sin autenticación")
-    //     public void accesoRecursoSinAutenticacion(){
-           
-    //     }
-
-    //     // Este test no funciona porque no se puede inyectar el MockMvc
-    //     @Autowired
-    //     private MockMvc mockMvc;
-
-    //     @Test
-    //     @WithMockUser(username = "admin", roles = "ADMIN")
-    //     @DisplayName("Acceso del admin a un recurso protegido")
-    //     public void testAdminAccessToAdminResource() throws Exception {
-    //         mockMvc.perform(MockMvcRequestBuilders.get("/admin-resource")
-    //             .contentType(MediaType.APPLICATION_JSON))
-    //             .andExpect(status().isOk());
-    //     }
-
-    //     @Test
-    //     @WithMockUser(username = "user", roles = "USER")
-    //     @DisplayName("Acceso de usuario no autorizado a un recurso protegido")
-    //     public void testUserAccessToAdminResource() throws Exception {
-    //         mockMvc.perform(MockMvcRequestBuilders.get("/admin-resource")
-    //             .contentType(MediaType.APPLICATION_JSON))
-    //             .andExpect(status().isForbidden());
-    //     }
-
-    //     @Test
-    //     @DisplayName("Acceso a un recurso no protegido")
-    //     public void testAccessToUnsecuredResource() throws Exception {
-    //         mockMvc.perform(MockMvcRequestBuilders.get("/unsecured-resource")
-    //             .contentType(MediaType.APPLICATION_JSON))
-    //             .andExpect(status().isOk());
-    //     }
-
-    //     @Test
-    //     @DisplayName("Acceso a un recurso protegido sin autenticación")
-    //     public void testAccessToSecuredResourceWithoutAuthentication() throws Exception {
-    //         mockMvc.perform(MockMvcRequestBuilders.get("/secured-resource")
-    //             .contentType(MediaType.APPLICATION_JSON))
-    //             .andExpect(status().isUnauthorized());
-    //     }
-
-    //     // @Test
-    //     // public void testAccessToSecuredResourceWithAuthentication() throws Exception {
-    //     //     String token = getToken("user", "password");
-
-    //     //     mockMvc.perform(get("/secured-resource")
-    //     //             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
-    //     //             .andExpect(status().isOk());
-    //     // }
-
-    //     // private String getToken(String username, String password) throws Exception {
-    //     //     AuthenticationRequest authenticationRequest = new AuthenticationRequest();
-    //     //     authenticationRequest.setUsername(username);
-    //     //     authenticationRequest.setPassword(password);
-
-    //     //     MvcResult result = mockMvc.perform(post("/authenticate")
-    //     //             .contentType(MediaType.APPLICATION_JSON)
-    //     //             .content(objectMapper.writeValueAsString(authenticationRequest)))
-    //     //             .andReturn();
-
-    //     //     String tokenJson = result.getResponse().getContentAsString();
-    //     //     Map<String, String> map = objectMapper.readValue(tokenJson, new TypeReference<Map<String, String>>() {});
-
-    //     //     return map.get("token");
-    //     // }
-    // }
-
-
+    }
 }
