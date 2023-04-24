@@ -29,3 +29,45 @@ Las entidades JPA del microservicio de Gestión del Estudiantado son las siguien
 ## Generación de esquema de base de datos
 
 El proyecto cuenta con una clase principal que genera las instrucciones DDL para generar el esquema de la base de datos al ejecutar la clase principal. Esto se realiza automáticamente mediante el plugin `maven-compiler-plugin` de Maven.
+
+# Tarea 2 - Implementación de microservicios
+
+En esta tarea, el grupo **SouthDevelopers** ha implementado los microservicios de Gestión de Usuarios y Gestión del Estudiantado utilizando el framework Spring Boot. Cada microservicio se encuentra en su propio proyecto Maven, los cuales incluyen:
+
+- Las entidades JPA necesarias, las cuales fueron entregadas en la tarea 1.
+- Los repositorios de Spring Data JPA necesarios.
+- Los servicios implementando la capa de negocio.
+- Los controladores REST implementando la capa de presentación.
+- Un conjunto de casos de prueba desarrolladas con JUnit 5 para probar el microservicio.
+
+## Microservicio de Gestión de Usuarios
+
+El microservicio de Gestión de Usuarios cuenta con la siguiente estructura de paquetes:
+
+- `com.southdev.svnn.controllers`: contiene los controladores REST para la gestión de usuarios.
+- `com.southdev.svnn.entities`: contiene las entidades JPA para la gestión de usuarios.
+- `com.southdev.svnn.repositories`: contiene los repositorios de Spring Data JPA para la gestión de usuarios.
+- `com.southdev.svnn.services`: contiene los servicios para la gestión de usuarios.
+- `com.southdev.svnn.userManagement`: contiene la clase principal del microservicio de Gestión de Usuarios.
+
+En la clase `UserManagementApplication` se encuentra la lógica para crear, actualizar, buscar y eliminar usuarios de la base de datos. Además, en la clase `UserManagementTest` se encuentran los casos de prueba para comprobar el correcto funcionamiento del microservicio.
+
+## Microservicio de Gestión del Estudiantado
+
+El microservicio de Gestión del Estudiantado cuenta con la siguiente estructura de paquetes:
+
+- `com.southdev.svnn.controllers`: contiene los controladores REST para la gestión del estudiantado.
+- `com.southdev.svnn.entities`: contiene las entidades JPA para la gestión del estudiantado.
+- `com.southdev.svnn.repositories`: contiene los repositorios de Spring Data JPA para la gestión del estudiantado.
+- `com.southdev.svnn.services`: contiene los servicios para la gestión del estudiantado.
+- `com.southdev.svnn.studentManagement`: contiene la clase principal del microservicio de Gestión del Estudiantado.
+
+En la clase `StudentManagementApplication` se encuentra la lógica para importar información de alumnos, obtener el listado de alumnos y gestionar las matrículas y necesidades especiales de los alumnos. Además, en la clase `StudentManagementApplicationTests` se encuentran los casos de prueba para comprobar el correcto funcionamiento del microservicio.
+
+## Casos de prueba
+
+Cada microservicio cuenta con un conjunto de casos de prueba desarrolladas con JUnit 5. Los casos de prueba se encuentran en las siguientes clases:
+
+- `UserManagementTest`: casos de prueba para el microservicio de Gestión de Usuarios.
+- `StudentManagementApplicationTests`: casos de prueba para el microservicio de Gestión del Estudiantado.
+
