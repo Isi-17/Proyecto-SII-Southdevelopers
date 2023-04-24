@@ -1,12 +1,12 @@
 package com.uma.southdevelopers.dto;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class RespuestaTokenDTO {
     private String jwt;
-
-    public RespuestaTokenDTO(String jwt){
-        this.jwt = jwt;
-    }
 }

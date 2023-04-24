@@ -1,10 +1,12 @@
 package com.uma.southdevelopers.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Getter
+@Setter
 @NoArgsConstructor
-@Data
+@AllArgsConstructor
+@Builder
 public class PasswordresetDTO {
     private String email;
 }

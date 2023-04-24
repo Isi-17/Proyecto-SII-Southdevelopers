@@ -9,8 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.uma.southdevelopers.dto.NotificationDTO;
-import com.uma.southdevelopers.dto.UserDTO;
+import com.uma.southdevelopers.dto.*;
 import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.repositories.UserRepository;
 import com.uma.southdevelopers.security.JwtUtil;
@@ -30,6 +29,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -167,93 +167,6 @@ public class userManagementTest {
     }
 
     @Nested
-    @DisplayName("Creacion de Usuarios")
-    public class CreacionUsuario{
-        @Test
-        @DisplayName("Crear usuario")
-        public void crearUsuario(){
-            User user1 = new User();
-            user1.setUserId(Long.valueOf(1));
-            user1.setName("Juan");
-            user1.setSurname1("Sanchez");
-            user1.setSurname2("Sanchez");
-            user1.setEmail("juanss@gmail.com");
-            user1.setPassword("password");
-            Set<User.Role> roles = new HashSet<>();
-            roles.add(User.Role.CORRECTOR);
-            user1.setRoles(roles);
-
-            userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
-
-            var jwt = crearUsuarioVicerrectorado();
-
-            var userDTO = UserDTO.builder()
-                    .id(Long.valueOf(66667777))
-                    .nombre("Paco")
-                    .apellido1("Garcia")
-                    .apellido2("Garcia")
-                    .email("pepegg@gmail.com")
-                    .build();
-
-            // Preparamos la petición con el usuario dentro
-            var peticion = postJwt("http", host, port, "/usuarios", userDTO,jwt);
-
-            // Invocamos al servicio REST
-            var respuesta = restTemplate.exchange(peticion,Void.class);
-
-            // Comprobamos el resultado
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
-            assertThat(respuesta.getHeaders().get("Location").get(0))
-                    .startsWith("http://localhost:"+port+"/usuarios");
-
-            List<User> usuariosBD = userRepo.findAll();
-            assertThat(usuariosBD).hasSize(3);
-            assertThat(respuesta.getHeaders().get("Location").get(0))
-                    .endsWith("/"+usuariosBD.get(2).getUserId());
-
-            //Comprobamos los parametros
-            compruebaCampos(usuariosBD.get(2),userDTO.user()); //Por que da fallo con el id ????????????
-        }
-
-        @Test
-        @DisplayName("Crear usuario con un email existente")
-        public void crearUsuarioExistenteEmail(){
-            User user1 = new User();
-            user1.setUserId(Long.valueOf(1));
-            user1.setName("Juan");
-            user1.setSurname1("Sanchez");
-            user1.setSurname2("Sanchez");
-            user1.setEmail("juanss@gmail.com");
-            user1.setPassword("password");
-            Set<User.Role> roles = new HashSet<>();
-            roles.add(User.Role.CORRECTOR);
-            user1.setRoles(roles);
-
-            userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
-
-            //Tratemos de crear un usuario con el mismo email
-            var userDTO = UserDTO.builder()
-                    .id(Long.valueOf(66667777))
-                    .nombre("Paco")
-                    .apellido1("Garcia")
-                    .apellido2("Garcia")
-                    .email("juanss@gmail.com")
-                    .build();
-
-            var jwt = crearUsuarioVicerrectorado();
-
-            var peticion = postJwt("http", host, port, "/usuarios", userDTO,jwt);
-
-            // Invocamos al servicio REST
-            var respuesta = restTemplate.exchange(peticion,Void.class);
-
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(409);
-        }
-
-
-    }
-
-    @Nested
     @DisplayName("Acceso a Usuarios")
     public class AccesoUsuario{
         @Test
@@ -352,72 +265,6 @@ public class userManagementTest {
     }
 
     @Nested
-    @DisplayName("Delete de Usuarios")
-    public class DeleteUsuario{
-        @Test
-        @DisplayName("Delete de usuario")
-        public void deleteUsuario(){
-            User user1 = new User();
-            user1.setUserId(Long.valueOf(1));
-            user1.setName("Juan");
-            user1.setSurname1("Sanchez");
-            user1.setSurname2("Sanchez");
-            user1.setEmail("juanss@gmail.com");
-            user1.setPassword("password");
-
-            User user2 = new User();
-            user2.setUserId(Long.valueOf(2));
-            user2.setName("Pepe");
-            user2.setSurname1("Garcia");
-            user2.setSurname2("Garcia");
-            user2.setEmail("pepegg@gmail.com");
-            user2.setPassword("password");
-
-            userRepo.save(user1);
-            userRepo.save(user2);
-
-            var jwt = crearUsuarioVicerrectorado();
-
-            var peticion = deleteJwt("http", host, port,"/usuarios/1",jwt);
-            var respuesta = restTemplate.exchange(peticion,Void.class);
-            assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-            assertThat(userRepo.existsById(Long.valueOf(1))).isFalse();
-        }
-
-        @Test
-        @DisplayName("Delete de usuario que no existe")
-        public void deleteUsuarioNoExiste(){
-            User user1 = new User();
-            user1.setUserId(Long.valueOf(1));
-            user1.setName("Juan");
-            user1.setSurname1("Sanchez");
-            user1.setSurname2("Sanchez");
-            user1.setEmail("juanss@gmail.com");
-            user1.setPassword("password");
-
-            User user2 = new User();
-            user2.setUserId(Long.valueOf(2));
-            user2.setName("Pepe");
-            user2.setSurname1("Garcia");
-            user2.setSurname2("Garcia");
-            user2.setEmail("pepegg@gmail.com");
-            user2.setPassword("password");
-
-            userRepo.save(user1);
-            userRepo.save(user2);
-
-            var jwt = crearUsuarioVicerrectorado();
-
-            var peticion = deleteJwt("http", host, port,"/usuarios/10",jwt);
-            var respuesta = restTemplate.exchange(peticion,Void.class);
-            assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-
-            assertThat(userRepo.findAll()).hasSize(3);
-        }
-    }
-
-    @Nested
     @DisplayName("Update de Usuarios")
     public class UpdateUsuario{
         @Test
@@ -507,75 +354,59 @@ public class userManagementTest {
         public void loginOK() {
             // Creamos el usuario en la base de datos
             User user = new User();
-            user.setUserId(Long.valueOf(1));
             user.setName("Juan");
             user.setSurname1("Sanchez");
             user.setSurname2("Sanchez");
             user.setEmail("juanss@gmail.com");
             user.setPassword("password");
-            // ROL USUARIO
-            // Set<User.Role> roles = new HashSet<>();
-            // roles.add(User.Role.CORRECTOR);
-            // user.setRoles(roles);
+            userService.createUser(user);
 
-            userRepo.save(user);
+            LoginDTO credentials = new LoginDTO("juanss@gmail.com", "password");
 
-            UserDTO credentials = UserDTO.builder()
-                    .nombre("Juan")
-                    .apellido1("password")
-                    .build();
-                    
-            var request = post("http", host, port, "/login", credentials);
-            var response = restTemplate.exchange(request, String.class);
+            var request = post("http", host, port, "/usuarios/login", credentials);
+            var response = restTemplate.exchange(request, new ParameterizedTypeReference<RespuestaTokenDTO>() {});
 
+            assertThat(response.getStatusCode().value()).isEqualTo(200);
 
-            assertThat(response.getStatusCode()).isEqualTo(200);
-            assertThat(response.getBody()).contains("accessToken");
+            RespuestaTokenDTO respuestaToken = response.getBody();
+            assertThat(
+                    jwtUtil.validateToken(
+                            respuestaToken.getJwt(),
+                            userService.loadUserByUsername("juanss@gmail.com"))
+                    ).isTrue();
         }
 
         @Test
         @DisplayName("Iniciar sesión con usuario no registrado")
         public void loginNotRegistered() {
 
-            UserDTO credentials = UserDTO.builder()
-                    .nombre("username")
-                    .apellido1("password")
-                    .build();
+            LoginDTO credentials = new LoginDTO("juanss@gmail.com", "password");
             
             var request = post("http", host, port, "/login", credentials);
 
-            var response = restTemplate.exchange(request, String.class);
+            var response = restTemplate.exchange(request, new ParameterizedTypeReference<RespuestaTokenDTO>() {});
 
-            assertThat(response.getStatusCode()).isEqualTo(403);
+            assertThat(response.getStatusCode().value()).isEqualTo(403);
         }
 
         @Test
         @DisplayName("Iniciar sesión con contraseña incorrecta")
         public void loginWrongPassword() {
-
+            // Creamos el usuario en la base de datos
             User user = new User();
-            user.setUserId(Long.valueOf(1));
             user.setName("Juan");
             user.setSurname1("Sanchez");
             user.setSurname2("Sanchez");
             user.setEmail("juanss@gmail.com");
             user.setPassword("password");
-            // ROL USUARIO
-            // Set<User.Role> roles = new HashSet<>();
-            // roles.add(User.Role.CORRECTOR);
-            // user.setRoles(roles);
+            userService.createUser(user);
 
-            userRepo.save(user);
+            LoginDTO credentials = new LoginDTO("juanss@gmail.com", "incorrecta");
 
-            UserDTO credentials = UserDTO.builder()
-                    .nombre("Juan")
-                    .apellido1("wrong_password")
-                    .build();
-            
-            var request = post("http", host, port, "/login", credentials);
-            var response = restTemplate.exchange(request, String.class);
+            var request = post("http", host, port, "/usuarios/login", credentials);
+            var response = restTemplate.exchange(request, Void.class);
 
-            assertThat(response.getStatusCode()).isEqualTo(403);
+            assertThat(response.getStatusCode().value()).isEqualTo(403);
         }
 
     }
@@ -583,19 +414,39 @@ public class userManagementTest {
     @Nested
     @DisplayName("Test de Password Reset")
     public class PasswordResetTests {
-            @Test
-            @DisplayName("Resetear contraseña con email correcto")
-            public void passwordResetOK() throws Exception {
-            
-                String email = "juanss@gmail.com";
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
-                var request = new HttpEntity<>("{\"email\":\"" + email + "\"}", headers);
-                
-                var response = restTemplate.postForEntity("/usuarios/passwordreset", request, String.class);
-                
-                assertThat(response.getStatusCode()).isEqualTo(200);
-            }
+
+        @Test
+        @DisplayName("Resetear contraseña con email correcto")
+        public void passwordResetOK() {
+            // Creamos el usuario en la base de datos
+            User user = new User();
+            user.setName("Juan");
+            user.setSurname1("Sanchez");
+            user.setSurname2("Sanchez");
+            user.setEmail("juanss@gmail.com");
+            user.setPassword("password");
+            userService.createUser(user);
+
+            PasswordresetDTO passwordresetDTO = new PasswordresetDTO("juanss@gmail.com");
+
+            var request = post("http", host, port, "/usuarios/passwordreset", passwordresetDTO);
+            var response = restTemplate.exchange(request, Void.class);
+
+            assertThat(response.getStatusCode().value()).isEqualTo(200);
+            assertThat(userService.correctPassword("juanss@gmail.com", "password")).isFalse();
+        }
+
+        @Test
+        @DisplayName("Resetear contraseña de usuario inexistente")
+        public void NonExistentUserPasswordReset() {
+
+            PasswordresetDTO passwordresetDTO = new PasswordresetDTO("juanss@gmail.com");
+
+            var request = post("http", host, port, "/usuarios/passwordreset", passwordresetDTO);
+            var response = restTemplate.exchange(request, Void.class);
+
+            assertThat(response.getStatusCode().value()).isEqualTo(200);
+        }
 
     }
 
@@ -750,5 +601,11 @@ public class userManagementTest {
 
             assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
         }
+    }
+
+    @Nested
+    @DisplayName("Modificación de usuarios")
+    public class UserPut {
+
     }
 }

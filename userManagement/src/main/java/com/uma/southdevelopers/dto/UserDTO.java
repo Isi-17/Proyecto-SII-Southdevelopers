@@ -2,14 +2,15 @@ package com.uma.southdevelopers.dto;
 
 import com.uma.southdevelopers.entities.User;
 import com.uma.southdevelopers.security.PasswordUtils;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class UserDTO {
     private long id;
