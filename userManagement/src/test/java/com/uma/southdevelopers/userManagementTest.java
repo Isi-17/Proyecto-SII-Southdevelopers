@@ -638,9 +638,4 @@ public class userManagementTest {
         }
     }
 
-    @Nested
-    @DisplayName("Modificación de usuarios")
-    public class UserPut {
-
-    }
 }

@@ -2,7 +2,6 @@ package com.uma.southdevelopers.controllers;
 
 import com.uma.southdevelopers.dto.*;
 import com.uma.southdevelopers.entities.User;
-import com.uma.southdevelopers.controllers.NotificationControllerDummie;
 import com.uma.southdevelopers.security.JwtUtil;
 import com.uma.southdevelopers.security.PasswordUtils;
 import com.uma.southdevelopers.service.UserService;
@@ -10,7 +9,6 @@ import com.uma.southdevelopers.service.exceptions.UserNotFoundException;
 import com.uma.southdevelopers.service.exceptions.WrongCredentialsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
@@ -35,6 +33,14 @@ public class UserController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Value("{local.server.host}")
+    private String host;
+
+    private int port = 8082;  //Puerto en el que se ejecuta el microservicio de notificaciones
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     private URI uri(String scheme, String host, int port, String ...paths) {
         UriBuilderFactory ubf = new DefaultUriBuilderFactory();
@@ -103,9 +109,9 @@ public class UserController {
                 .build();
 
         //En caso de que las notificaciones fuesen por una api externa:
-        /*var peticion = post("http", notiHost, port,"/notification", notiDTO);
+        var peticion = post("http", host, port,"/notification", notiDTO);
 
-        var respuesta = restTemplate.exchange(peticion, Void.class);*/
+        var respuesta = restTemplate.exchange(peticion, Void.class);
 
         //En caso de que este en la misma api (tengo problemas por que el metodo no es estatico)
         /*NotificationControllerDummie.enviarNoti(notiDTO);*/
