@@ -93,14 +93,6 @@ public class userManagementTest {
         return peticion;
     }
 
-    private RequestEntity<Void> deleteJwt(String scheme, String host, int port, String path, String jwt) {
-        URI uri = uri(scheme, host,port, path);
-        var peticion = RequestEntity.delete(uri)
-                .header("Authorization", "Bearer "+jwt)
-                .build();
-        return peticion;
-    }
-
     private <T> RequestEntity<T> post(String scheme, String host, int port, String path, T object) {
         URI uri = uri(scheme, host,port, path);
         var peticion = RequestEntity.post(uri)
@@ -112,6 +104,32 @@ public class userManagementTest {
     private <T> RequestEntity<T> postJwt(String scheme, String host, int port, String path, T object, String jwt) {
         URI uri = uri(scheme, host,port, path);
         var peticion = RequestEntity.post(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer "+jwt)
+                .body(object);
+        return peticion;
+    }
+
+    private RequestEntity<Void> getJwt(String scheme, String host, int port, String path, String jwt) {
+        URI uri = uri(scheme, host,port, path);
+        var peticion = RequestEntity.get(uri)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer "+jwt)
+                .build();
+        return peticion;
+    }
+
+    private RequestEntity<Void> deleteJwt(String scheme, String host, int port, String path, String jwt) {
+        URI uri = uri(scheme, host,port, path);
+        var peticion = RequestEntity.delete(uri)
+                .header("Authorization", "Bearer "+jwt)
+                .build();
+        return peticion;
+    }
+
+    private <T> RequestEntity<T> putJwt(String scheme, String host, int port, String path, T object, String jwt) {
+        URI uri = uri(scheme, host,port, path);
+        var peticion = RequestEntity.put(uri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer "+jwt)
                 .body(object);
@@ -149,102 +167,8 @@ public class userManagementTest {
     }
 
     @Nested
-    @DisplayName("Con la Base de Datos Vacia")
-    @WithMockUser()
-    public class BaseDeDatosVacia {
-        @Test
-        @DisplayName("Acceder a un usuario concreto")
-        public void errorConUsuarioConcreto() {
-            var peticion = get("http", host, port, "/usuarios/1");
-
-            var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<UserDTO>() {});
-
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
-        }
-        @Test
-        @DisplayName("Lista vacía de usuarios")
-        public void devuelveListaVaciaUsuarios() {
-            var peticion = get("http", host, port, "/usuarios");
-
-            var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<List<User>>() {});
-
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-            assertThat(respuesta.getBody()).isEmpty();
-        }
-
-        @Test
-        @DisplayName("Crear usuario")
-        public void insertaUsuario() {
-
-            // Preparamos el usuario a insertar
-            var userDTO = UserDTO.builder()
-                    .id(Long.valueOf(66667777))
-                    .nombre("Paco")
-                    .apellido1("Garcia")
-                    .apellido2("Garcia")
-                    .email("pepegg@gmail.com")
-                    .build();
-            // Preparamos la petición con el usuario dentro
-            var peticion = post("http", host, port, "/usuarios", userDTO);
-
-            // Invocamos al servicio REST
-            var respuesta = restTemplate.exchange(peticion,Void.class);
-
-            // Comprobamos el resultado
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
-            assertThat(respuesta.getHeaders().get("Location").get(0))
-                    .startsWith("http://localhost:"+port+"/usuarios");
-
-            List<User> usuariosBD = userRepo.findAll();
-            assertThat(usuariosBD).hasSize(1);
-            assertThat(respuesta.getHeaders().get("Location").get(0))
-                    .endsWith("/"+usuariosBD.get(0).getUserId());
-
-            //Comprobamos los parametros
-            compruebaCampos(usuariosBD.get(0),userDTO.user()); //Por que da fallo con el id ????????????
-        }
-
-        @Test
-        @DisplayName("Delete de usuario")
-        public void deleteUsuarioNoExiste(){
-            var peticion = delete("http", host, port,"/usuarios/3");
-            var respuesta = restTemplate.exchange(peticion,Void.class);
-            assertThat(respuesta.getStatusCode()).isEqualTo(404);
-        }
-
-        @Test
-        @DisplayName("Update de usuario que no existe")
-        public void updateUsuarioNoExiste(){
-
-            User user1 = new User();
-            user1.setUserId(Long.valueOf(1));
-            user1.setName("Juan");
-            user1.setSurname1("Sanchez");
-            user1.setSurname2("Sanchez");
-            user1.setEmail("juanss@gmail.com");
-            user1.setPassword("password");
-
-            UserDTO userDTO = UserDTO.fromUser(user1);
-            userDTO.setNombre("JuanNuevo");
-            userDTO.setApellido1("SanchezNuevo");
-            userDTO.setApellido2("SanchezNuevo");
-            userDTO.setEmail("juanssNUEVO@gmail.com");
-
-            var peticion = put("http", host, port,"/usuarios/3",userDTO);
-            var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<UserDTO>() {});
-
-            assertThat(respuesta.getStatusCode()).isEqualTo(404);
-
-        }
-
-    }
-
-    @Nested
-    @DisplayName("Con Datos en la Base de Datos")
-    public class BaseDeDatosNoVacia{
+    @DisplayName("Creacion de Usuarios")
+    public class CreacionUsuario{
         @Test
         @DisplayName("Crear usuario")
         public void crearUsuario(){
@@ -261,6 +185,8 @@ public class userManagementTest {
 
             userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
 
+            var jwt = crearUsuarioVicerrectorado();
+
             var userDTO = UserDTO.builder()
                     .id(Long.valueOf(66667777))
                     .nombre("Paco")
@@ -270,7 +196,7 @@ public class userManagementTest {
                     .build();
 
             // Preparamos la petición con el usuario dentro
-            var peticion = post("http", host, port, "/usuarios", userDTO);
+            var peticion = postJwt("http", host, port, "/usuarios", userDTO,jwt);
 
             // Invocamos al servicio REST
             var respuesta = restTemplate.exchange(peticion,Void.class);
@@ -281,12 +207,12 @@ public class userManagementTest {
                     .startsWith("http://localhost:"+port+"/usuarios");
 
             List<User> usuariosBD = userRepo.findAll();
-            assertThat(usuariosBD).hasSize(2);
+            assertThat(usuariosBD).hasSize(3);
             assertThat(respuesta.getHeaders().get("Location").get(0))
-                    .endsWith("/"+usuariosBD.get(1).getUserId());
+                    .endsWith("/"+usuariosBD.get(2).getUserId());
 
             //Comprobamos los parametros
-            compruebaCampos(usuariosBD.get(1),userDTO.user()); //Por que da fallo con el id ????????????
+            compruebaCampos(usuariosBD.get(2),userDTO.user()); //Por que da fallo con el id ????????????
         }
 
         @Test
@@ -314,7 +240,9 @@ public class userManagementTest {
                     .email("juanss@gmail.com")
                     .build();
 
-            var peticion = post("http", host, port, "/usuarios", userDTO);
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = postJwt("http", host, port, "/usuarios", userDTO,jwt);
 
             // Invocamos al servicio REST
             var respuesta = restTemplate.exchange(peticion,Void.class);
@@ -322,6 +250,12 @@ public class userManagementTest {
             assertThat(respuesta.getStatusCode().value()).isEqualTo(409);
         }
 
+
+    }
+
+    @Nested
+    @DisplayName("Acceso a Usuarios")
+    public class AccesoUsuario{
         @Test
         @DisplayName("Acceder a usuario existente")
         public void accederUsuarioExistente(){
@@ -338,46 +272,19 @@ public class userManagementTest {
 
             userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
 
-            var peticion = get("http", host, port, "/usuarios/1");
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = getJwt("http", host, port, "/usuarios/1",jwt);
 
             var respuesta = restTemplate.exchange(peticion,
                     new ParameterizedTypeReference<UserDTO>() {});
 
             // Comprobamos el resultado
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
-            assertThat(respuesta.getHeaders().get("Location").get(0))
-                    .startsWith("http://localhost:"+port+"/usuarios");
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 
             UserDTO userDTORespuesta = respuesta.getBody();
 
             compruebaCampos(user1,userDTORespuesta.user());
-        }
-
-        @Test
-        @DisplayName("Acceder a usuario no existente")
-        public void accederUsuarioNoExistente(){
-            User user1 = new User();
-            user1.setUserId(Long.valueOf(1));
-            user1.setName("Juan");
-            user1.setSurname1("Sanchez");
-            user1.setSurname2("Sanchez");
-            user1.setEmail("juanss@gmail.com");
-            user1.setPassword("password");
-            Set<User.Role> roles = new HashSet<>();
-            roles.add(User.Role.CORRECTOR);
-            user1.setRoles(roles);
-
-            userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
-
-            var peticion = get("http", host, port, "/usuarios/2");
-
-            var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<UserDTO>() {});
-
-            // Comprobamos el resultado
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
-            assertThat(respuesta.getHeaders().get("Location").get(0))
-                    .startsWith("http://localhost:"+port+"/usuarios");
         }
 
         @Test
@@ -402,19 +309,51 @@ public class userManagementTest {
             userRepo.save(user1);
             userRepo.save(user2);
 
+            var jwt = crearUsuarioVicerrectorado();
 
-            var peticion = get("http", host, port, "/usuarios");
+            var peticion = getJwt("http", host, port, "/usuarios",jwt);
 
             var respuesta = restTemplate.exchange(peticion,
                     new ParameterizedTypeReference<List<UserDTO>>() {});
 
             assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-            assertThat(respuesta.getBody()).hasSize(2);
+            assertThat(respuesta.getBody()).hasSize(3);
 
             compruebaCampos(user1,respuesta.getBody().get(0).user());
             compruebaCampos(user2,respuesta.getBody().get(1).user());
         }
 
+        @Test
+        @DisplayName("Acceder a usuario no existente")
+        public void accederUsuarioNoExistente(){
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+            Set<User.Role> roles = new HashSet<>();
+            roles.add(User.Role.CORRECTOR);
+            user1.setRoles(roles);
+
+            userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
+
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = getJwt("http", host, port, "/usuarios/10",jwt);
+
+            var respuesta = restTemplate.exchange(peticion,
+                    Void.class);
+
+            // Comprobamos el resultado
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+        }
+    }
+
+    @Nested
+    @DisplayName("Delete de Usuarios")
+    public class DeleteUsuario{
         @Test
         @DisplayName("Delete de usuario")
         public void deleteUsuario(){
@@ -437,9 +376,11 @@ public class userManagementTest {
             userRepo.save(user1);
             userRepo.save(user2);
 
-            var peticion = delete("http", host, port,"/usuarios/1");
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = deleteJwt("http", host, port,"/usuarios/1",jwt);
             var respuesta = restTemplate.exchange(peticion,Void.class);
-            assertThat(respuesta.getStatusCode()).isEqualTo(200);
+            assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             assertThat(userRepo.existsById(Long.valueOf(1))).isFalse();
         }
@@ -466,13 +407,19 @@ public class userManagementTest {
             userRepo.save(user1);
             userRepo.save(user2);
 
-            var peticion = delete("http", host, port,"/usuarios/3");
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = deleteJwt("http", host, port,"/usuarios/10",jwt);
             var respuesta = restTemplate.exchange(peticion,Void.class);
-            assertThat(respuesta.getStatusCode()).isEqualTo(404);
+            assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
-            assertThat(userRepo.findAll()).hasSize(2);
+            assertThat(userRepo.findAll()).hasSize(3);
         }
+    }
 
+    @Nested
+    @DisplayName("Update de Usuarios")
+    public class UpdateUsuario{
         @Test
         @DisplayName("Update de usuario")
         public void updateUsuario(){
@@ -501,11 +448,13 @@ public class userManagementTest {
             userDTO.setApellido2("SanchezNuevo");
             userDTO.setEmail("juanssNUEVO@gmail.com");
 
-            var peticion = put("http", host, port,"/usuarios/1",userDTO);
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = putJwt("http", host, port,"/usuarios/1",userDTO,jwt);
             var respuesta = restTemplate.exchange(peticion,
                     new ParameterizedTypeReference<UserDTO>() {});
 
-            assertThat(respuesta.getStatusCode()).isEqualTo(200);
+            assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             compruebaCampos(respuesta.getBody().user(), userDTO.user());
             compruebaCampos(userRepo.findById(Long.valueOf(1)).get(),userDTO.user());
@@ -539,11 +488,13 @@ public class userManagementTest {
             userDTO.setApellido2("SanchezNuevo");
             userDTO.setEmail("juanssNUEVO@gmail.com");
 
-            var peticion = put("http", host, port,"/usuarios/3",userDTO);
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = putJwt("http", host, port,"/usuarios/10",userDTO,jwt);
             var respuesta = restTemplate.exchange(peticion,
                     new ParameterizedTypeReference<UserDTO>() {});
 
-            assertThat(respuesta.getStatusCode()).isEqualTo(404);
+            assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
         }
     }
