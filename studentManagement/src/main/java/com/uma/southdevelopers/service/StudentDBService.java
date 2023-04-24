@@ -2,7 +2,7 @@ package com.uma.southdevelopers.service;
 
 import com.uma.southdevelopers.entities.Institute;
 import com.uma.southdevelopers.entities.Student;
-import com.uma.southdevelopers.repositories.EnrolmentRepository;
+import com.uma.southdevelopers.repositories.SubjectRepository;
 import com.uma.southdevelopers.repositories.InstituteRepository;
 import com.uma.southdevelopers.repositories.StudentRepository;
 import com.uma.southdevelopers.service.exceptions.EntityDoNotDeleteException;
@@ -20,15 +20,15 @@ public class StudentDBService {
 
     private StudentRepository studentRepository;
     private InstituteRepository instituteRepository;
-    private EnrolmentRepository enrolmentRepository;
+    private SubjectRepository subjectRepository;
 
     @Autowired
     public StudentDBService(StudentRepository repo,
-                            EnrolmentRepository enrolmentRepository,
+                            SubjectRepository subjectRepository,
                             InstituteRepository instituteRepository) {
         this.studentRepository = repo;
         this.instituteRepository = instituteRepository;
-        this.enrolmentRepository = enrolmentRepository;
+        this.subjectRepository = subjectRepository;
     }
 
     public List<Student> allStudents() {
