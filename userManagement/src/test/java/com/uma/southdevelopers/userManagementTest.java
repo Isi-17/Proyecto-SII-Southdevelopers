@@ -93,6 +93,14 @@ public class userManagementTest {
         return peticion;
     }
 
+    private RequestEntity<Void> deleteJwt(String scheme, String host, int port, String path, String jwt) {
+        URI uri = uri(scheme, host,port, path);
+        var peticion = RequestEntity.delete(uri)
+                .header("Authorization", "Bearer "+jwt)
+                .build();
+        return peticion;
+    }
+
     private <T> RequestEntity<T> post(String scheme, String host, int port, String path, T object) {
         URI uri = uri(scheme, host,port, path);
         var peticion = RequestEntity.post(uri)
@@ -712,6 +720,84 @@ public class userManagementTest {
             var respuesta = restTemplate.exchange(peticion, Void.class);
 
             assertThat(respuesta.getStatusCode().value()).isEqualTo(409);
+        }
+    }
+
+    @Nested
+    @DisplayName("Eliminación de usuarios")
+    public class UserDelete {
+        @Test
+        @DisplayName("Usuario eliminado correctamente (200)")
+        public void correctDelete(){
+            var userDTO = UserDTO.builder()
+                    .nombre("usuario1")
+                    .apellido1("apellido1")
+                    .apellido2("apellido2")
+                    .email("usuario@email.es")
+                    .build();
+
+            var user = userDTO.user();
+            user.setPassword("1234");
+            userRepo.save(user);
+
+            var jwt = crearUsuarioVicerrectorado();
+
+            // Hay dos usuarios el que tiene rol de vicerrectorado y el usuario
+            assertThat(userRepo.findAll()).hasSize(2);
+
+            var usuario = userRepo.findByEmail("usuario@email.es").get();
+
+            var peticion = deleteJwt("http", host, port, "/usuarios/"+usuario.getUserId(), jwt);
+            var respuesta = restTemplate.exchange(peticion, Void.class);
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+
+            // El usuario ha sido correctamente eliminado
+            assertThat(userRepo.findAll()).hasSize(1);
+            var deleteUser = userRepo.findByEmail("usuario@email.es");
+            assertThat(deleteUser).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Usuario no eliminado por acceso no autorizado (403)")
+        public void UnauthorizedDelete(){
+            var userDTO = UserDTO.builder()
+                    .nombre("usuario1")
+                    .apellido1("apellido1")
+                    .apellido2("apellido2")
+                    .email("usuario@email.es")
+                    .build();
+
+            var user = userDTO.user();
+            user.setPassword("1234");
+            userRepo.save(user);
+
+            var jwt = crearUsuarioCorrector();
+
+            // Hay dos usuarios el que tiene rol de corrector y el usuario
+            assertThat(userRepo.findAll()).hasSize(2);
+
+            var usuario = userRepo.findByEmail("usuario@email.es").get();
+
+            var peticion = deleteJwt("http", host, port, "/usuarios/"+usuario.getUserId(), jwt);
+            var respuesta = restTemplate.exchange(peticion, Void.class);
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+        }
+
+        @Test
+        @DisplayName("Usuario inexistente (404)")
+        public void NonExistentUserDelete(){
+
+            var jwt = crearUsuarioVicerrectorado();
+
+            var id = 100L;
+
+            var peticion = deleteJwt("http", host, port, "/usuarios/"+
+                    (userRepo.existsById(id)? id : id+1), jwt);
+            var respuesta = restTemplate.exchange(peticion, Void.class);
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
         }
     }
 }
