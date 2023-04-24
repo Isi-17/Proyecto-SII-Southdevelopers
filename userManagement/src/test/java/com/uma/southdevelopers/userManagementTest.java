@@ -643,6 +643,7 @@ public class userManagementTest {
     @Nested
     @DisplayName("Creación de usuarios")
     public class userCreation {
+
         @Test
         @DisplayName("Usuario creado correctamente (201)")
         public void correctUserCreation(){
@@ -671,6 +672,46 @@ public class userManagementTest {
 
             assertThat(respuesta.getHeaders().get("Location").get(0))
                     .endsWith("/"+user.getUserId());
+        }
+
+        @Test
+        @DisplayName("Usuario no creado por acceso no autorizado (403)")
+        public void nonVicerrectorUserCreation(){
+            var userDTO = UserDTO.builder()
+                    .nombre("usuario1")
+                    .apellido1("apellido1")
+                    .apellido2("apellido2")
+                    .email("usuario@email.es")
+                    .build();
+
+            var jwt = crearUsuarioCorrector();
+
+            var peticion = postJwt("http", host, port, "/usuarios", userDTO, jwt);
+            var respuesta = restTemplate.exchange(peticion, Void.class);
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+        }
+
+        @Test
+        @DisplayName("Usuario no creado por coincidencia de email de usuario ya registrado (409)")
+        public void sameEmailUserCreation(){
+            var userDTO = UserDTO.builder()
+                    .nombre("usuario1")
+                    .apellido1("apellido1")
+                    .apellido2("apellido2")
+                    .email("usuario@email.es")
+                    .build();
+
+            var user = userDTO.user();
+            user.setPassword("password");
+            userRepo.save(user);
+
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = postJwt("http", host, port, "/usuarios", userDTO, jwt);
+            var respuesta = restTemplate.exchange(peticion, Void.class);
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(409);
         }
     }
 }
