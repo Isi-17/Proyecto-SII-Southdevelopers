@@ -107,8 +107,8 @@ public class UserController {
                 .build();
 
         var peticion = post("http", host, port,"/notification", notiDTO);
-        var respuesta = restTemplate.exchange(peticion,Void.class);
-
+        //var respuesta = restTemplate.exchange(peticion,Void.class); //Descomentar esta linea cuando el microservicio
+                                                                    //de notificaciones este activo en el puerto port
         return  ResponseEntity.ok(newPassword.get()); // TODO: devolvemos contraseña para las pruebas, quitar.
     }
 
