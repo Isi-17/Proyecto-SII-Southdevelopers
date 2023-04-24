@@ -29,37 +29,6 @@ public class NewStudentDTO {
     private Long idInstituto;
     private boolean noEliminar;
 
-
-    public static NewStudentDTO fromStudent(Student student, Long idConvocatoria) {
-        var dto = new NewStudentDTO();
-
-        dto.setId(student.getId());
-        CompleteNameDTO completeNameDTO = new CompleteNameDTO(student.getNombre(), student.getApellido1(), student.getApellido2());
-        dto.setNombreCompleto(completeNameDTO);
-        dto.setDni(student.getDni());
-        dto.setTelefono(student.getTelefono());
-        dto.setEmail(student.getEmail());
-        List<Long> materias = new ArrayList<>();
-        List<Enrolment> matriculas = student.getMatriculas();
-        for (Enrolment enrolment : matriculas) {
-            if(idConvocatoria == null && enrolment.getIdConvocatoria() == 2023L) {
-                for (Subject subject : enrolment.getMateriasMatriculadas()){
-                    materias.add(subject.getId());
-                }
-            } else if (idConvocatoria != null && enrolment.getIdConvocatoria() == idConvocatoria) {
-                for (Subject subject : enrolment.getMateriasMatriculadas()){
-                    materias.add(subject.getId());
-                }
-            }
-        }
-        dto.setMateriasMatriculadas(materias);
-        dto.setIdSede(student.getIdSede());
-        dto.setIdInstituto(student.getInstituto().getId());
-        dto.setNoEliminar(student.isNoEliminar());
-
-        return dto;
-    }
-
     public Student student(Institute institute, List<Enrolment> matriculas) {
         var stud = new Student();
 

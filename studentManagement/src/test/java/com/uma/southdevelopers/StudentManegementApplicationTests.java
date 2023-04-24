@@ -3,7 +3,6 @@ package com.uma.southdevelopers;
 import com.uma.southdevelopers.dtos.*;
 import com.uma.southdevelopers.entities.Enrolment;
 import com.uma.southdevelopers.entities.Subject;
-import com.uma.southdevelopers.repositories.SubjectRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.springframework.core.ParameterizedTypeReference;
@@ -282,13 +281,48 @@ public class StudentManegementApplicationTests {
                 List<Student> estudiantesBD = studentRepo.findAll();
                 assertThat(estudiantesBD).hasSize(1);
 
-                System.out.println(estudiantesBD.get(0).getNombre());
-
                 List<Subject> materias = new ArrayList<>();
                 materias.add(materia);
                 List<Enrolment> matriculas = new ArrayList<>();
                 matriculas.add(new Enrolment(1L, 2023L, materias));
                 checkFields(estudiante.student(instituto, matriculas), estudiantesBD.get(0));
+            }
+
+            @Test
+            @DisplayName("Inserta un estudiante, no encuentra el instituto y devuelve 404")
+            public void insertaEstudianteSinInstituto(){
+
+                // Subimos una materia
+                Subject materia = new Subject();
+                materia.setNombre("Matematicas");
+                materia.setId(1L);
+
+                restTemplate.exchange(post("http", "localhost", port, "/materias",
+                        materia), Void.class);
+
+                // Vamos a subir el estudiante
+                CompleteNameDTO cn = new CompleteNameDTO();
+                cn.setNombre("Jesus");
+                cn.setApellido1("Escudero");
+                cn.setApellido2("Moreno");
+
+                var estudiante = NewStudentDTO.builder()
+                        .id(1L)
+                        .materiasMatriculadas(List.of(1L))
+                        .idInstituto(1L)
+                        .nombreCompleto(cn)
+                        .build();
+
+                var peticion = post("http", "localhost", port, "/estudiantes",
+                        estudiante);
+
+                var respuesta = restTemplate.exchange(peticion, Void.class);
+
+                assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+
+                List<Student> estudiantesBD = studentRepo.findAll();
+                assertThat(estudiantesBD).hasSize(0);
+
             }
 
             @Test
@@ -434,9 +468,15 @@ public class StudentManegementApplicationTests {
                     instituto), Void.class);
 
             // Subimos una materia
-            Subject materia = new Subject();
-            materia.setNombre("Matematicas");
-            materia.setId(1L);
+            Subject materia = new Subject(1L, "Matematicas", true);
+
+            restTemplate.exchange(post("http", "localhost", port, "/materias",
+                    materia), Void.class);
+
+            // Subimos una materia
+            materia = new Subject();
+            materia.setNombre("Lengua");
+            materia.setId(2L);
 
             restTemplate.exchange(post("http", "localhost", port, "/materias",
                     materia), Void.class);
@@ -730,6 +770,34 @@ public class StudentManegementApplicationTests {
             }
 
             @Test
+            @DisplayName("Inserta un estudiante con materia no existente y devuelve 404")
+            public void insertaEstudianteConMateriaExistente(){
+
+                // Vamos a subir el estudiante
+                CompleteNameDTO cn = new CompleteNameDTO();
+                cn.setNombre("Jesus");
+                cn.setApellido1("Escudero");
+                cn.setApellido2("Moreno");
+
+                var estudiante = NewStudentDTO.builder()
+                        .id(1L)
+                        .materiasMatriculadas(List.of(3L))
+                        .idInstituto(1L)
+                        .nombreCompleto(cn)
+                        .build();
+
+                var peticion = post("http", "localhost", port, "/estudiantes",
+                        estudiante);
+
+                var respuesta = restTemplate.exchange(peticion, Void.class);
+
+                assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+
+                List<Student> estudiantesBD = studentRepo.findAll();
+                assertThat(estudiantesBD).hasSize(1);
+            }
+
+            @Test
             @DisplayName("Inserta un estudiante con un DNI ya existente y devuelve 409")
             public void insertaEstudianteConDniRepetido(){
 
@@ -920,6 +988,50 @@ public class StudentManegementApplicationTests {
             }
 
             @Test
+            @DisplayName("Modificar un estudiante (cambiando la lista de materias) y devuelve 200")
+            public void actualizaEstudianteConMaterias(){
+
+                NewStudentDTO newStudentDTO = new NewStudentDTO();
+                CompleteNameDTO nombreCompleto = new CompleteNameDTO("Alvaro", "Sanchez", "Hernandez");
+                newStudentDTO.setNombreCompleto(nombreCompleto);
+                newStudentDTO.setDni("12345678A");
+                newStudentDTO.setMateriasMatriculadas(List.of(1L, 2L));
+                newStudentDTO.setIdInstituto(1L);
+                newStudentDTO.setIdSede(1L);
+                newStudentDTO.setNoEliminar(false);
+
+                var peticionPut = put("http", "localhost", port, "/estudiantes/1", newStudentDTO);
+
+                var respuestaPut = restTemplate.exchange(peticionPut, new ParameterizedTypeReference<StudentDTO>() {
+                });
+                assertThat(respuestaPut.getStatusCode().value()).isEqualTo(200);
+
+                List<Student> estudiantesBD = studentRepo.findAll();
+                assertThat(estudiantesBD).hasSize(1);
+                checkFields(respuestaPut.getBody(), estudiantesBD.get(0));
+            }
+
+            @Test
+            @DisplayName("Modificar un estudiante (con materias no existentes) y devuelve 404")
+            public void actualizaEstudianteConMateriasNoExistentes(){
+
+                NewStudentDTO newStudentDTO = new NewStudentDTO();
+                CompleteNameDTO nombreCompleto = new CompleteNameDTO("Alvaro", "Sanchez", "Hernandez");
+                newStudentDTO.setNombreCompleto(nombreCompleto);
+                newStudentDTO.setDni("12345678A");
+                newStudentDTO.setMateriasMatriculadas(List.of(1L, 3L)); // La materia 3 no existe
+                newStudentDTO.setIdInstituto(1L);
+                newStudentDTO.setIdSede(1L);
+                newStudentDTO.setNoEliminar(false);
+
+                var peticionPut = put("http", "localhost", port, "/estudiantes/1", newStudentDTO);
+
+                var respuestaPut = restTemplate.exchange(peticionPut, new ParameterizedTypeReference<StudentDTO>() {
+                });
+                assertThat(respuestaPut.getStatusCode().value()).isEqualTo(404);
+            }
+
+            @Test
             @DisplayName("Modificar un estudiante con un DNI ya existente y devuelve 409")
             public void actualizaEstudianteConDniRepetido(){
 
@@ -1092,5 +1204,66 @@ public class StudentManegementApplicationTests {
             // Comprobamos que efectivamente tenemos 2 estudiantes en la base de datos
             assertThat(studentRepo.findAll()).hasSize(2);
         }
+
+        @Test
+        @DisplayName("Subir csv de estudiantes con DNI existente")
+        public void subirCSVconDniExistente() {
+            // Datos de ejemplo
+            String csvData = "CENTRO;Nombre;Apellido1;Apellido2;DNI/NIF;DETALLE_MATERIAS\n" +
+                    "IES;Paula;Gámez;Baños;12345678A;Matematicas";
+
+            String baseUrl = "http://localhost:"+port+"/estudiantes/upload";
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("ficheroEstudiantes", new ByteArrayResource(csvData.getBytes()) {
+                @Override
+                public String getFilename() {
+                    return "estudiantes.csv"; // Nombre del archivo
+                }
+            });
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA); // Establecer el tipo de contenido a multipart/form-data
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<ImportacionEstudiantesDTO> response = restTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity,
+                    new ParameterizedTypeReference<ImportacionEstudiantesDTO>() {});
+
+            assertThat(response.getStatusCode().value()).isEqualTo(200);
+            // Comprobamos que la lista de importados es no vacia
+            assertThat(!(response.getBody().getNoImportados().isEmpty()));
+        }
+
+        @Test
+        @DisplayName("Subir csv de estudiantes con Instituto no existente")
+        public void subirCSVconInstitutoYMateriasNoExistente() {
+            // Datos de ejemplo
+            String csvData = "CENTRO;Nombre;Apellido1;Apellido2;DNI/NIF;DETALLE_MATERIAS\n" +
+                    "IESNoExiste;Paula;Gámez;Baños;12345678A;MatematicasNoExiste";
+
+            String baseUrl = "http://localhost:"+port+"/estudiantes/upload";
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("ficheroEstudiantes", new ByteArrayResource(csvData.getBytes()) {
+                @Override
+                public String getFilename() {
+                    return "estudiantes.csv"; // Nombre del archivo
+                }
+            });
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA); // Establecer el tipo de contenido a multipart/form-data
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<ImportacionEstudiantesDTO> response = restTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity,
+                    new ParameterizedTypeReference<ImportacionEstudiantesDTO>() {});
+
+            assertThat(response.getStatusCode().value()).isEqualTo(200);
+            // Comprobamos que la lista de importados es no vacia
+            assertThat(!(response.getBody().getNoImportados().isEmpty()));
+        }
+
     }
 }

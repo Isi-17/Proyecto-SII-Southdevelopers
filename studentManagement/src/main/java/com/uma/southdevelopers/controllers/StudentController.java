@@ -49,14 +49,6 @@ public class StudentController {
         this.serviceMatriculas = serviceMatriculas;
     }
 
-    public static Function<Long, URI> studentUriBuilder(UriComponents uriBuilder) {
-        return id -> UriComponentsBuilder.newInstance().uriComponents(uriBuilder).path("/estudiantes")
-                .path(String.format("/%d", id))
-                .build()
-                .toUri();
-    }
-
-
     @GetMapping
     public List<StudentDTO> obtainStudents(@RequestParam(value = "idSede", required = false) Long idSede,
                                               @RequestParam(value = "idConvocatoria", required = false) Long idConvocatoria) {

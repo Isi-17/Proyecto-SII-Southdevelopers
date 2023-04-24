@@ -30,13 +30,6 @@ public class InstituteController {
         this.studentService = studentService;
     }
 
-    public static Function<Long, URI> instituteUriBuilder(UriComponents uriBuilder) {
-        return id -> UriComponentsBuilder.newInstance().uriComponents(uriBuilder).path("/institutes")
-                .path(String.format("/%d", id))
-                .build()
-                .toUri();
-    }
-
     @GetMapping
     public List<InstituteDTO> obtainInstitutes() {
         var institutes = service.allInstitutes();

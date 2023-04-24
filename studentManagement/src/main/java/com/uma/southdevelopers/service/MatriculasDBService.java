@@ -20,10 +20,6 @@ public class MatriculasDBService {
         this.enrolmentRepository = enrolmentRepository;
     }
 
-    public List<Enrolment> allMatriculas() {
-        return enrolmentRepository.findAll();
-    }
-
     public Long addMatriculas(Enrolment enrolment) {
         enrolment.setId(null);
         enrolmentRepository.save(enrolment);
