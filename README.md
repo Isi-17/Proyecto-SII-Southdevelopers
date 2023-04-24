@@ -61,10 +61,9 @@ El microservicio de Gestión del Estudiantado cuenta con la siguiente estructura
 - `src.main.java.com.uma.southdevelopers.dto`: contiene las clases de transferencia de datos para la gestión del estudiantado.
 - `src.main.java.com.uma.southdevelopers.entities`: contiene las entidades JPA para la gestión del estudiantado.
 - `src.main.java.com.uma.southdevelopers.repositories`: contiene los repositorios de Spring Data JPA para la gestión del estudiantado.
-- `src.main.java.com.uma.southdevelopers.security`: contiene la configuración de seguridad para la gestión del estudiantado.
 - `src.main.java.com.uma.southdevelopers.service`: contiene los servicios para la gestión del estudiantado.
 
-La clase `StudentManagementApplication.java` contiene la clase principal del microservicio de Gestión del Estudiantado. En `InstituteController.java` se encuentra la lógica para importar información de alumnos, obtener el listado de alumnos y gestionar las matrículas y necesidades especiales de los alumnos.
+La clase `StudentManagementApplication.java` contiene la clase principal del microservicio de Gestión del Estudiantado. En `StudentController.java` se encuentra la lógica para importar información de alumnos, obtener el listado de alumnos y gestionar las matrículas y necesidades especiales de los alumnos.
 
 ## Casos de prueba
 
