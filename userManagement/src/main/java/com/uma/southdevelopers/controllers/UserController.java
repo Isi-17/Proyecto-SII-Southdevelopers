@@ -35,11 +35,11 @@ public class UserController {
     private JwtUtil jwtUtil;
 
     /*@Value("{local.server.host}")
-    private String host;*/
+    private String host;
 
     //private int port = 8082;  //Puerto en el que se ejecuta el microservicio de notificaciones
 
-    /*@Autowired
+    @Autowired
     private RestTemplate restTemplate;*/
 
     private URI uri(String scheme, String host, int port, String ...paths) {
