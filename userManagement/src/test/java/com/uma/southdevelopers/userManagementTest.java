@@ -373,8 +373,7 @@ public class userManagementTest {
             var jwt = crearUsuarioVicerrectorado();
 
             var peticion = putJwt("http", host, port,"/usuarios/10",userDTO,jwt);
-            var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<UserDTO>() {});
+            var respuesta = restTemplate.exchange(peticion,Void.class);
 
             assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
