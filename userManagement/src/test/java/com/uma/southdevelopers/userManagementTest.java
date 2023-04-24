@@ -45,8 +45,6 @@ import org.springframework.web.util.UriBuilderFactory;
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @DisplayName("Tests de userManagement")
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@ActiveProfiles("test")
-
 public class userManagementTest {
 
     @Autowired
@@ -113,6 +111,7 @@ public class userManagementTest {
 
     @Nested
     @DisplayName("Con la Base de Datos Vacia")
+    @WithMockUser()
     public class BaseDeDatosVacia {
         @Test
         @DisplayName("Acceder a un usuario concreto")

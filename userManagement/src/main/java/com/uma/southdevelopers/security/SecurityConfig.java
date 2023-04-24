@@ -28,7 +28,6 @@ public class SecurityConfig {
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
-    @Profile("!test")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         // We don't need CSRF for this example
@@ -69,7 +68,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Profile("test")
     public SecurityFilterChain filterChainDisabled(HttpSecurity http) throws Exception {
         http
                 .cors()
