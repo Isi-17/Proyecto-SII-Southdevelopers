@@ -235,8 +235,8 @@ public class userManagementTest {
     }
 
     @Nested
-    @DisplayName("Con Datos en la Base de Datos")
-    public class BaseDeDatosNoVacia{
+    @DisplayName("Creacion de Usuarios")
+    public class CreacionUsuario{
         @Test
         @DisplayName("Crear usuario")
         public void crearUsuario(){
@@ -253,6 +253,8 @@ public class userManagementTest {
 
             userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
 
+            var jwt = crearUsuarioVicerrectorado();
+
             var userDTO = UserDTO.builder()
                     .id(Long.valueOf(66667777))
                     .nombre("Paco")
@@ -262,7 +264,7 @@ public class userManagementTest {
                     .build();
 
             // Preparamos la petición con el usuario dentro
-            var peticion = post("http", host, port, "/usuarios", userDTO);
+            var peticion = postJwt("http", host, port, "/usuarios", userDTO,jwt);
 
             // Invocamos al servicio REST
             var respuesta = restTemplate.exchange(peticion,Void.class);
@@ -273,12 +275,12 @@ public class userManagementTest {
                     .startsWith("http://localhost:"+port+"/usuarios");
 
             List<User> usuariosBD = userRepo.findAll();
-            assertThat(usuariosBD).hasSize(2);
+            assertThat(usuariosBD).hasSize(3);
             assertThat(respuesta.getHeaders().get("Location").get(0))
-                    .endsWith("/"+usuariosBD.get(1).getUserId());
+                    .endsWith("/"+usuariosBD.get(2).getUserId());
 
             //Comprobamos los parametros
-            compruebaCampos(usuariosBD.get(1),userDTO.user()); //Por que da fallo con el id ????????????
+            compruebaCampos(usuariosBD.get(2),userDTO.user()); //Por que da fallo con el id ????????????
         }
 
         @Test
@@ -314,6 +316,46 @@ public class userManagementTest {
             assertThat(respuesta.getStatusCode().value()).isEqualTo(409);
         }
 
+        @Test
+        @DisplayName("Acceder a lista de usuarios")
+        public void accederListaUsuarios(){
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+
+            User user2 = new User();
+            user2.setUserId(Long.valueOf(2));
+            user2.setName("Pepe");
+            user2.setSurname1("Garcia");
+            user2.setSurname2("Garcia");
+            user2.setEmail("pepegg@gmail.com");
+            user2.setPassword("password");
+
+            userRepo.save(user1);
+            userRepo.save(user2);
+
+
+            var peticion = get("http", host, port, "/usuarios");
+
+            var respuesta = restTemplate.exchange(peticion,
+                    new ParameterizedTypeReference<List<UserDTO>>() {});
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+            assertThat(respuesta.getBody()).hasSize(2);
+
+            compruebaCampos(user1,respuesta.getBody().get(0).user());
+            compruebaCampos(user2,respuesta.getBody().get(1).user());
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Acceso a Usuarios")
+    public class AccesoUsuario{
         @Test
         @DisplayName("Acceder a usuario existente")
         public void accederUsuarioExistente(){
@@ -371,42 +413,11 @@ public class userManagementTest {
             assertThat(respuesta.getHeaders().get("Location").get(0))
                     .startsWith("http://localhost:"+port+"/usuarios");
         }
+    }
 
-        @Test
-        @DisplayName("Acceder a lista de usuarios")
-        public void accederListaUsuarios(){
-            User user1 = new User();
-            user1.setUserId(Long.valueOf(1));
-            user1.setName("Juan");
-            user1.setSurname1("Sanchez");
-            user1.setSurname2("Sanchez");
-            user1.setEmail("juanss@gmail.com");
-            user1.setPassword("password");
-
-            User user2 = new User();
-            user2.setUserId(Long.valueOf(2));
-            user2.setName("Pepe");
-            user2.setSurname1("Garcia");
-            user2.setSurname2("Garcia");
-            user2.setEmail("pepegg@gmail.com");
-            user2.setPassword("password");
-
-            userRepo.save(user1);
-            userRepo.save(user2);
-
-
-            var peticion = get("http", host, port, "/usuarios");
-
-            var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<List<UserDTO>>() {});
-
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-            assertThat(respuesta.getBody()).hasSize(2);
-
-            compruebaCampos(user1,respuesta.getBody().get(0).user());
-            compruebaCampos(user2,respuesta.getBody().get(1).user());
-        }
-
+    @Nested
+    @DisplayName("Delete de Usuarios")
+    public class DeleteUsuario{
         @Test
         @DisplayName("Delete de usuario")
         public void deleteUsuario(){
@@ -464,7 +475,11 @@ public class userManagementTest {
 
             assertThat(userRepo.findAll()).hasSize(2);
         }
+    }
 
+    @Nested
+    @DisplayName("Update de Usuarios")
+    public class UpdateUsuario{
         @Test
         @DisplayName("Update de usuario")
         public void updateUsuario(){
