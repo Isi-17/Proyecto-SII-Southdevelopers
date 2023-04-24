@@ -26,6 +26,8 @@ public class Student {
     @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private List<Enrolment> matriculas;
     private Long idSede;
+    @ManyToMany
+    private List<SpecialNeeds> specialNeeds;
     @OneToOne
     private Institute instituto;
     private boolean noEliminar;
