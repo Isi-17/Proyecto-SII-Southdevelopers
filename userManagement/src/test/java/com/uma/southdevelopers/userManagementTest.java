@@ -23,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -593,21 +594,21 @@ public class userManagementTest {
     @Nested
     @DisplayName("Test de Password Reset")
     public class PasswordResetTests {
-        //     @Test
-        //     @DisplayName("Resetear contraseña con email correcto")
-        //     public void passwordResetOK() throws Exception {
+            @Test
+            @DisplayName("Resetear contraseña con email correcto")
+            public void passwordResetOK() throws Exception {
             
-        //         String email = "juanss@gmail.com";
-        //         HttpHeaders headers = new HttpHeaders();
-        //         headers.setContentType(MediaType.APPLICATION_JSON);
-        //         var request = new HttpEntity<>("{\"email\":\"" + email + "\"}", headers);
+                String email = "juanss@gmail.com";
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                var request = new HttpEntity<>("{\"email\":\"" + email + "\"}", headers);
                 
-        //         var response = restTemplate.postForEntity("/usuarios/passwordreset", request, String.class);
+                var response = restTemplate.postForEntity("/usuarios/passwordreset", request, String.class);
                 
-        //         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        //     }
-        // }
-    }
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            }
+        }
+    
     @Nested
     @DisplayName("Test Acceso&Token")
     public class AccesoTokenTests{
@@ -721,5 +722,6 @@ public class userManagementTest {
         //     return map.get("token");
         // }
     }
+
 
 }
