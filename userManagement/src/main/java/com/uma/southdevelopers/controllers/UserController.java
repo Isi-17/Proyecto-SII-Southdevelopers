@@ -115,22 +115,14 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        try {
-            User updatedUser = userService.updateUser(id, userDTO.user());
-            return new ResponseEntity<>(UserDTO.fromUser(updatedUser), HttpStatus.OK);
-        }catch (UserNotFoundException e){
-            return ResponseEntity.notFound().build();
-        }
+        User updatedUser = userService.updateUser(id, userDTO.user());
+        return new ResponseEntity<>(UserDTO.fromUser(updatedUser), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.ok().build();
-        }catch (UserNotFoundException e){
-            return ResponseEntity.notFound().build();
-        }
+        userService.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/login")

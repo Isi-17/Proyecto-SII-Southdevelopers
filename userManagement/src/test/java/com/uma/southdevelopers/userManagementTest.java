@@ -167,44 +167,79 @@ public class userManagementTest {
     }
 
     @Nested
-    @DisplayName("Acceso a Usuarios")
-    public class AccesoUsuario{
+    @DisplayName("Acceso a usuario individual")
+    public class AccesoUsuarioIndividual {
+
         @Test
         @DisplayName("Acceder a usuario existente")
         public void accederUsuarioExistente(){
-            User user1 = new User();
-            user1.setUserId(Long.valueOf(1));
-            user1.setName("Juan");
-            user1.setSurname1("Sanchez");
-            user1.setSurname2("Sanchez");
-            user1.setEmail("juanss@gmail.com");
-            user1.setPassword("password");
-            Set<User.Role> roles = new HashSet<>();
-            roles.add(User.Role.CORRECTOR);
-            user1.setRoles(roles);
-
-            userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
+            // Creamos el usuario en la base de datos
+            User user = new User();
+            user.setName("Juan");
+            user.setSurname1("Sanchez");
+            user.setSurname2("Sanchez");
+            user.setEmail("juanss@gmail.com");
+            user.setPassword("password");
+            User savedUser = userService.createUser(user);
 
             var jwt = crearUsuarioVicerrectorado();
 
-            var peticion = getJwt("http", host, port, "/usuarios/1",jwt);
+            var peticion = getJwt("http", host, port, "/usuarios/"+savedUser.getUserId(), jwt);
 
             var respuesta = restTemplate.exchange(peticion,
                     new ParameterizedTypeReference<UserDTO>() {});
 
-            // Comprobamos el resultado
             assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 
             UserDTO userDTORespuesta = respuesta.getBody();
 
-            compruebaCampos(user1,userDTORespuesta.user());
+            compruebaCampos(savedUser ,userDTORespuesta.user());
         }
 
         @Test
-        @DisplayName("Acceder a lista de usuarios")
+        @DisplayName("Acceder a usuario sin autorización")
+        public void accederUsuarioExistenteSinAutorizacion(){
+            // Creamos el usuario en la base de datos
+            User user = new User();
+            user.setName("Juan");
+            user.setSurname1("Sanchez");
+            user.setSurname2("Sanchez");
+            user.setEmail("juanss@gmail.com");
+            user.setPassword("password");
+            User savedUser = userService.createUser(user);
+
+            var peticion = get("http", host, port, "/usuarios/"+savedUser.getUserId());
+
+            var respuesta = restTemplate.exchange(peticion,
+                    new ParameterizedTypeReference<UserDTO>() {});
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+        }
+
+        @Test
+        @DisplayName("Acceder a usuario no existente")
+        public void accederUsuarioNoExistente(){
+
+            var jwt = crearUsuarioCorrector();
+
+            var id = 100L;
+
+            var peticion = getJwt("http", host, port, "/usuarios/"+
+                    (userRepo.existsById(id)? id : id+1), jwt);
+            var respuesta = restTemplate.exchange(peticion,
+                    Void.class);
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+        }
+    }
+
+    @Nested
+    @DisplayName("Acceso a todos los usuarios")
+    public class AccesoUsuarioLista {
+        @Test
+        @DisplayName("Acceder a lista de usuarios con autorización")
         public void accederListaUsuarios(){
             User user1 = new User();
-            user1.setUserId(Long.valueOf(1));
             user1.setName("Juan");
             user1.setSurname1("Sanchez");
             user1.setSurname2("Sanchez");
@@ -212,17 +247,16 @@ public class userManagementTest {
             user1.setPassword("password");
 
             User user2 = new User();
-            user2.setUserId(Long.valueOf(2));
             user2.setName("Pepe");
             user2.setSurname1("Garcia");
             user2.setSurname2("Garcia");
             user2.setEmail("pepegg@gmail.com");
             user2.setPassword("password");
 
-            userRepo.save(user1);
-            userRepo.save(user2);
+            User savedUser1 = userService.createUser(user1);
+            User savedUser2 = userService.createUser(user2);
 
-            var jwt = crearUsuarioVicerrectorado();
+            var jwt = crearUsuarioCorrector();
 
             var peticion = getJwt("http", host, port, "/usuarios",jwt);
 
@@ -232,35 +266,36 @@ public class userManagementTest {
             assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
             assertThat(respuesta.getBody()).hasSize(3);
 
-            compruebaCampos(user1,respuesta.getBody().get(0).user());
-            compruebaCampos(user2,respuesta.getBody().get(1).user());
+            compruebaCampos(user1, respuesta.getBody().get(0).user());
+            compruebaCampos(user2, respuesta.getBody().get(1).user());
         }
 
         @Test
-        @DisplayName("Acceder a usuario no existente")
-        public void accederUsuarioNoExistente(){
+        @DisplayName("Acceder a lista de usuarios sin autorización")
+        public void accederListaUsuariosSinAutorizacion(){
             User user1 = new User();
-            user1.setUserId(Long.valueOf(1));
             user1.setName("Juan");
             user1.setSurname1("Sanchez");
             user1.setSurname2("Sanchez");
             user1.setEmail("juanss@gmail.com");
             user1.setPassword("password");
-            Set<User.Role> roles = new HashSet<>();
-            roles.add(User.Role.CORRECTOR);
-            user1.setRoles(roles);
 
-            userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
+            User user2 = new User();
+            user2.setName("Pepe");
+            user2.setSurname1("Garcia");
+            user2.setSurname2("Garcia");
+            user2.setEmail("pepegg@gmail.com");
+            user2.setPassword("password");
 
-            var jwt = crearUsuarioVicerrectorado();
+            User savedUser1 = userService.createUser(user1);
+            User savedUser2 = userService.createUser(user2);
 
-            var peticion = getJwt("http", host, port, "/usuarios/10",jwt);
+            var peticion = get("http", host, port, "/usuarios");
 
             var respuesta = restTemplate.exchange(peticion,
-                    Void.class);
+                    new ParameterizedTypeReference<List<UserDTO>>() {});
 
-            // Comprobamos el resultado
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
         }
     }
 
