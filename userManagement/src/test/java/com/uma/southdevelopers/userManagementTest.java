@@ -119,6 +119,23 @@ public class userManagementTest {
         return peticion;
     }
 
+    private RequestEntity<Void> deleteJwt(String scheme, String host, int port, String path, String jwt) {
+        URI uri = uri(scheme, host,port, path);
+        var peticion = RequestEntity.delete(uri)
+                .header("Authorization", "Bearer "+jwt)
+                .build();
+        return peticion;
+    }
+
+    private <T> RequestEntity<T> putJwt(String scheme, String host, int port, String path, T object, String jwt) {
+        URI uri = uri(scheme, host,port, path);
+        var peticion = RequestEntity.put(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer "+jwt)
+                .body(object);
+        return peticion;
+    }
+
     private <T> RequestEntity<T> put(String scheme, String host, int port, String path, T object) {
         URI uri = uri(scheme, host,port, path);
         var peticion = RequestEntity.put(uri)
@@ -222,7 +239,9 @@ public class userManagementTest {
                     .email("juanss@gmail.com")
                     .build();
 
-            var peticion = post("http", host, port, "/usuarios", userDTO);
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = postJwt("http", host, port, "/usuarios", userDTO,jwt);
 
             // Invocamos al servicio REST
             var respuesta = restTemplate.exchange(peticion,Void.class);
@@ -356,9 +375,11 @@ public class userManagementTest {
             userRepo.save(user1);
             userRepo.save(user2);
 
-            var peticion = delete("http", host, port,"/usuarios/1");
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = deleteJwt("http", host, port,"/usuarios/1",jwt);
             var respuesta = restTemplate.exchange(peticion,Void.class);
-            assertThat(respuesta.getStatusCode()).isEqualTo(200);
+            assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             assertThat(userRepo.existsById(Long.valueOf(1))).isFalse();
         }
@@ -385,11 +406,13 @@ public class userManagementTest {
             userRepo.save(user1);
             userRepo.save(user2);
 
-            var peticion = delete("http", host, port,"/usuarios/3");
-            var respuesta = restTemplate.exchange(peticion,Void.class);
-            assertThat(respuesta.getStatusCode()).isEqualTo(404);
+            var jwt = crearUsuarioVicerrectorado();
 
-            assertThat(userRepo.findAll()).hasSize(2);
+            var peticion = deleteJwt("http", host, port,"/usuarios/10",jwt);
+            var respuesta = restTemplate.exchange(peticion,Void.class);
+            assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+            assertThat(userRepo.findAll()).hasSize(3);
         }
     }
 
@@ -424,11 +447,13 @@ public class userManagementTest {
             userDTO.setApellido2("SanchezNuevo");
             userDTO.setEmail("juanssNUEVO@gmail.com");
 
-            var peticion = put("http", host, port,"/usuarios/1",userDTO);
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = putJwt("http", host, port,"/usuarios/1",userDTO,jwt);
             var respuesta = restTemplate.exchange(peticion,
                     new ParameterizedTypeReference<UserDTO>() {});
 
-            assertThat(respuesta.getStatusCode()).isEqualTo(200);
+            assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             compruebaCampos(respuesta.getBody().user(), userDTO.user());
             compruebaCampos(userRepo.findById(Long.valueOf(1)).get(),userDTO.user());
@@ -462,11 +487,13 @@ public class userManagementTest {
             userDTO.setApellido2("SanchezNuevo");
             userDTO.setEmail("juanssNUEVO@gmail.com");
 
-            var peticion = put("http", host, port,"/usuarios/3",userDTO);
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = putJwt("http", host, port,"/usuarios/10",userDTO,jwt);
             var respuesta = restTemplate.exchange(peticion,
                     new ParameterizedTypeReference<UserDTO>() {});
 
-            assertThat(respuesta.getStatusCode()).isEqualTo(404);
+            assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
         }
     }
