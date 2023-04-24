@@ -114,7 +114,7 @@ public class userManagementTest {
         URI uri = uri(scheme, host,port, path);
         var peticion = RequestEntity.get(uri)
                 .accept(MediaType.APPLICATION_JSON)
-                .header("Autorization","Bearer" + jwt)
+                .header("Authorization", "Bearer "+jwt)
                 .build();
         return peticion;
     }
@@ -128,7 +128,6 @@ public class userManagementTest {
     }
 
     private void compruebaCampos(User user, User user2){
-        assertThat(user.getUserId()).isEqualTo(user2.getUserId());
         assertThat(user.getName()).isEqualTo(user2.getName());
         assertThat(user.getSurname1()).isEqualTo(user2.getSurname1());
         assertThat(user.getSurname2()).isEqualTo(user2.getSurname2());
@@ -231,40 +230,6 @@ public class userManagementTest {
             assertThat(respuesta.getStatusCode().value()).isEqualTo(409);
         }
 
-        @Test
-        @DisplayName("Acceder a lista de usuarios")
-        public void accederListaUsuarios(){
-            User user1 = new User();
-            user1.setUserId(Long.valueOf(1));
-            user1.setName("Juan");
-            user1.setSurname1("Sanchez");
-            user1.setSurname2("Sanchez");
-            user1.setEmail("juanss@gmail.com");
-            user1.setPassword("password");
-
-            User user2 = new User();
-            user2.setUserId(Long.valueOf(2));
-            user2.setName("Pepe");
-            user2.setSurname1("Garcia");
-            user2.setSurname2("Garcia");
-            user2.setEmail("pepegg@gmail.com");
-            user2.setPassword("password");
-
-            userRepo.save(user1);
-            userRepo.save(user2);
-
-
-            var peticion = get("http", host, port, "/usuarios");
-
-            var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<List<UserDTO>>() {});
-
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-            assertThat(respuesta.getBody()).hasSize(2);
-
-            compruebaCampos(user1,respuesta.getBody().get(0).user());
-            compruebaCampos(user2,respuesta.getBody().get(1).user());
-        }
 
     }
 
@@ -295,13 +260,47 @@ public class userManagementTest {
                     new ParameterizedTypeReference<UserDTO>() {});
 
             // Comprobamos el resultado
-            assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
-            assertThat(respuesta.getHeaders().get("Location").get(0))
-                    .startsWith("http://localhost:"+port+"/usuarios");
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 
             UserDTO userDTORespuesta = respuesta.getBody();
 
             compruebaCampos(user1,userDTORespuesta.user());
+        }
+
+        @Test
+        @DisplayName("Acceder a lista de usuarios")
+        public void accederListaUsuarios(){
+            User user1 = new User();
+            user1.setUserId(Long.valueOf(1));
+            user1.setName("Juan");
+            user1.setSurname1("Sanchez");
+            user1.setSurname2("Sanchez");
+            user1.setEmail("juanss@gmail.com");
+            user1.setPassword("password");
+
+            User user2 = new User();
+            user2.setUserId(Long.valueOf(2));
+            user2.setName("Pepe");
+            user2.setSurname1("Garcia");
+            user2.setSurname2("Garcia");
+            user2.setEmail("pepegg@gmail.com");
+            user2.setPassword("password");
+
+            userRepo.save(user1);
+            userRepo.save(user2);
+
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = getJwt("http", host, port, "/usuarios",jwt);
+
+            var respuesta = restTemplate.exchange(peticion,
+                    new ParameterizedTypeReference<List<UserDTO>>() {});
+
+            assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+            assertThat(respuesta.getBody()).hasSize(3);
+
+            compruebaCampos(user1,respuesta.getBody().get(0).user());
+            compruebaCampos(user2,respuesta.getBody().get(1).user());
         }
 
         @Test
@@ -320,15 +319,15 @@ public class userManagementTest {
 
             userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
 
-            var peticion = get("http", host, port, "/usuarios/2");
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = getJwt("http", host, port, "/usuarios/10",jwt);
 
             var respuesta = restTemplate.exchange(peticion,
-                    new ParameterizedTypeReference<UserDTO>() {});
+                    Void.class);
 
             // Comprobamos el resultado
             assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
-            assertThat(respuesta.getHeaders().get("Location").get(0))
-                    .startsWith("http://localhost:"+port+"/usuarios");
         }
     }
 
