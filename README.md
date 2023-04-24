@@ -44,30 +44,33 @@ En esta tarea, el grupo **SouthDevelopers** ha implementado los microservicios d
 
 El microservicio de Gestión de Usuarios cuenta con la siguiente estructura de paquetes:
 
-- `com.southdev.svnn.controllers`: contiene los controladores REST para la gestión de usuarios.
-- `com.southdev.svnn.entities`: contiene las entidades JPA para la gestión de usuarios.
-- `com.southdev.svnn.repositories`: contiene los repositorios de Spring Data JPA para la gestión de usuarios.
-- `com.southdev.svnn.services`: contiene los servicios para la gestión de usuarios.
-- `com.southdev.svnn.userManagement`: contiene la clase principal del microservicio de Gestión de Usuarios.
+- `src.main.java.com.uma.southdevelopers.controllers`: contiene los controladores REST para la gestión de usuarios.
+- `src.main.java.com.uma.southdevelopers.dto`: contiene las clases de transferencia de datos para la gestión de usuarios.
+- `src.main.java.com.uma.southdevelopers.entities`: contiene las entidades JPA para la gestión de usuarios.
+- `src.main.java.com.uma.southdevelopers.repositories`: contiene los repositorios de Spring Data JPA para la gestión de usuarios.
+- `src.main.java.com.uma.southdevelopers.security`: contiene la configuración de seguridad para la gestión de usuarios.
+- `src.main.java.com.uma.southdevelopers.service`: contiene los servicios para la gestión de usuarios.
 
-En la clase `UserManagementApplication` se encuentra la lógica para crear, actualizar, buscar y eliminar usuarios de la base de datos. Además, en la clase `UserManagementTest` se encuentran los casos de prueba para comprobar el correcto funcionamiento del microservicio.
+La clase `UserManagementApplication.java` contiene la clase principal del microservicio de Gestión de Usuarios. En `UserController.java` se encuentra la lógica para crear, actualizar, buscar y eliminar usuarios de la base de datos.
 
 ## Microservicio de Gestión del Estudiantado
 
 El microservicio de Gestión del Estudiantado cuenta con la siguiente estructura de paquetes:
 
-- `com.southdev.svnn.controllers`: contiene los controladores REST para la gestión del estudiantado.
-- `com.southdev.svnn.entities`: contiene las entidades JPA para la gestión del estudiantado.
-- `com.southdev.svnn.repositories`: contiene los repositorios de Spring Data JPA para la gestión del estudiantado.
-- `com.southdev.svnn.services`: contiene los servicios para la gestión del estudiantado.
-- `com.southdev.svnn.studentManagement`: contiene la clase principal del microservicio de Gestión del Estudiantado.
+- `src.main.java.com.uma.southdevelopers.controllers`: contiene los controladores REST para la gestión de institutos, materias y estudiantado.
+- `src.main.java.com.uma.southdevelopers.dto`: contiene las clases de transferencia de datos para la gestión del estudiantado.
+- `src.main.java.com.uma.southdevelopers.entities`: contiene las entidades JPA para la gestión del estudiantado.
+- `src.main.java.com.uma.southdevelopers.repositories`: contiene los repositorios de Spring Data JPA para la gestión del estudiantado.
+- `src.main.java.com.uma.southdevelopers.security`: contiene la configuración de seguridad para la gestión del estudiantado.
+- `src.main.java.com.uma.southdevelopers.service`: contiene los servicios para la gestión del estudiantado.
+- `src.main.java.com.uma.southdevelopers.studentManagement`: contiene la clase principal del microservicio de Gestión del Estudiantado.
 
-En la clase `StudentManagementApplication` se encuentra la lógica para importar información de alumnos, obtener el listado de alumnos y gestionar las matrículas y necesidades especiales de los alumnos. Además, en la clase `StudentManagementApplicationTests` se encuentran los casos de prueba para comprobar el correcto funcionamiento del microservicio.
+La clase `StudentManagementApplication.java` contiene la clase principal del microservicio de Gestión del Estudiantado. En `InstituteController.java` se encuentra la lógica para importar información de alumnos, obtener el listado de alumnos y gestionar las matrículas y necesidades especiales de los alumnos.
 
 ## Casos de prueba
 
 Cada microservicio cuenta con un conjunto de casos de prueba desarrolladas con JUnit 5. Los casos de prueba se encuentran en las siguientes clases:
 
-- `UserManagementTest`: casos de prueba para el microservicio de Gestión de Usuarios.
-- `StudentManagementApplicationTests`: casos de prueba para el microservicio de Gestión del Estudiantado.
+- `userManagementTest.java`: casos de prueba para el microservicio de Gestión de Usuarios.
+- `StudentManegementApplicationTests.java`: casos de prueba para el microservicio de Gestión del Estudiantado.
 
