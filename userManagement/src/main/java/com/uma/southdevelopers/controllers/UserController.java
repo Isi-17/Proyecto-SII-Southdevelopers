@@ -38,6 +38,8 @@ public class UserController {
 
     private int port = 8082;  //Puerto en el que se ejecuta el microservicio de notificaciones
 
+    private RestTemplate restTemplate = new RestTemplate();
+
     private URI uri(String scheme, String host, int port, String ...paths) {
         UriBuilderFactory ubf = new DefaultUriBuilderFactory();
         UriBuilder ub = ubf.builder()
@@ -104,11 +106,8 @@ public class UserController {
                 .medios(List.of("EMAIL"))
                 .build();
 
-        //En caso de que las notificaciones fuesen por una api externa:
         var peticion = post("http", host, port,"/notification", notiDTO);
-
-        //En caso de que este en la misma api (tengo problemas por que el metodo no es estatico)
-        /*NotificationControllerDummie.enviarNoti(notiDTO);*/
+        var respuesta = restTemplate.exchange(peticion,Void.class);
 
         return  ResponseEntity.ok(newPassword.get()); // TODO: devolvemos contraseña para las pruebas, quitar.
     }
