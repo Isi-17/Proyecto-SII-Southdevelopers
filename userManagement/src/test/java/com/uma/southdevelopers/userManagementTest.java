@@ -110,6 +110,15 @@ public class userManagementTest {
         return peticion;
     }
 
+    private RequestEntity<Void> getJwt(String scheme, String host, int port, String path, String jwt) {
+        URI uri = uri(scheme, host,port, path);
+        var peticion = RequestEntity.get(uri)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Autorization","Bearer" + jwt)
+                .build();
+        return peticion;
+    }
+
     private <T> RequestEntity<T> put(String scheme, String host, int port, String path, T object) {
         URI uri = uri(scheme, host,port, path);
         var peticion = RequestEntity.put(uri)
@@ -278,7 +287,9 @@ public class userManagementTest {
 
             userRepo.save(user1);       //Luego ya tendremos un usuario en la bbdd y por tanto no estará vacia
 
-            var peticion = get("http", host, port, "/usuarios/1");
+            var jwt = crearUsuarioVicerrectorado();
+
+            var peticion = getJwt("http", host, port, "/usuarios/1",jwt);
 
             var respuesta = restTemplate.exchange(peticion,
                     new ParameterizedTypeReference<UserDTO>() {});
