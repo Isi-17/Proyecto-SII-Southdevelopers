@@ -1,0 +1,24 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{accion}} contacto</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cierre usuario')"></button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input class="form-control" id="nombre" [(ngModel)]="instituto.nombre" placeholder="nombre">
+        <label for="direccion1">Direccion1:</label>
+        <input class="form-control" id="direccion1" [(ngModel)]="instituto.direccion1" placeholder="direccion1">
+        <label for="direccion2">Direccion2:</label>
+        <input class="form-control" id="direccion2" [(ngModel)]="instituto.direccion2" placeholder="direccion2">
+        <label for="localidad">Localidad:</label>
+        <input class="form-control" id="localidad" [(ngModel)]="instituto.localidad" placeholder="localidad">
+        <label for="codigoPostal">Codigo Postal:</label>
+        <input class="form-control" id="codigoPostal" [(ngModel)]="instituto.codigoPostal" placeholder="codigoPostal">
+        <label for="pais">Pais:</label>
+        <input class="form-control" id="pais" [(ngModel)]="instituto.pais" placeholder="pais">
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="guardarInstituto()">Guardar</button>
+  </div>
+  

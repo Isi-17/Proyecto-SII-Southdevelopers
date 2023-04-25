@@ -1,12 +1,17 @@
-<h1>Institutos</h1>
-<button type="button" class="btn btn-outline-primary bi bi-plus-lg">Añadir un instituto</button>
+<div class="col">
+    <h1>Institutos</h1>
+    <button (click)="addInstituto()" type="button" class="btn btn-outline-primary bi bi-plus-lg">Añadir un instituto</button>
+</div>
 
 <div class="container">
   <div class="row">
     <div class="col-md-6">
       <h1>Lista de Institutos</h1>
       <div class="list-group">
-        <app-instituto [instituto]="instituto" *ngFor="let instituto of institutos"></app-instituto>
+        <div *ngFor="let instituto of institutos">
+          <app-instituto [instituto]="instituto"></app-instituto>
+          <button (click)="deleteInstituto(instituto.id)" class="btn btn-outline-primary bi">Borrar instituto</button>
+        </div>
       </div>
     </div>
   </div>
