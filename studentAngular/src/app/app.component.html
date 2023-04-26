@@ -1,16 +1,43 @@
-<div class="col">
-    <h1>Institutos</h1>
-    <button (click)="addInstituto()" type="button" class="btn btn-outline-primary bi bi-plus-lg">Añadir un instituto</button>
-</div>
-
-<div class="container">
+<div class="container-fluid">
   <div class="row">
-    <div class="col-md-6">
-      <h1>Lista de Institutos</h1>
+    <div class="col">
+      <div class="row">
+        <h1>Institutos</h1>
+        <button (click)="addInstituto()" type="button" class="btn btn-outline-primary bi bi-plus-lg">Añadir un instituto</button>
+      </div>
       <div class="list-group">
         <div *ngFor="let instituto of institutos">
-          <app-instituto [instituto]="instituto"></app-instituto>
-          <button (click)="deleteInstituto(instituto.id)" class="btn btn-outline-primary bi">Borrar instituto</button>
+
+
+
+          <div ngbAccordion>
+            <div ngbAccordionItem>
+              <h2 ngbAccordionHeader>
+                <button ngbAccordionButton>{{instituto.nombre}}</button>
+              </h2>
+              <div ngbAccordionCollapse>
+                <div ngbAccordionBody>
+                  <ng-template>
+                    <div class="col-md-6">
+                      <p>ID: {{instituto.id}}</p>
+                      <p>Direccion1: {{instituto.direccion1}}</p>
+                      <p>Direccion2: {{instituto.direccion2}}</p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>LOCALIDAD: {{instituto.localidad}}</p>
+                      <p>Codigo postal: {{instituto.codigoPostal}}</p>
+                      <p>Pais: {{instituto.pais}}</p>
+                    </div>
+                    <button (click)="deleteInstituto(instituto.id)" type="button" class="btn btn-outline-primary bi ">Eliminar instituto</button>
+                    <button (click)="updateInstituto(instituto)" type="button" class="btn btn-outline-primary bi ">Modificar instituto</button>
+
+                  </ng-template>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          
         </div>
       </div>
     </div>

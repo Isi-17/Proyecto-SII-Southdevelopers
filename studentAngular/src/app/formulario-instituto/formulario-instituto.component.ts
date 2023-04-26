@@ -13,6 +13,7 @@ export class FormularioInstitutoComponent {
   instituto: Instituto = {id: 0, nombre: '', direccion1: '', 
     direccion2: '', localidad: '', codigoPostal: 0, pais: ''};
 
+
   constructor(public modal: NgbActiveModal) { }
 
   guardarInstituto(): void {
