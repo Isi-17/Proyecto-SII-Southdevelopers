@@ -1,9 +1,0 @@
-${AnsiColor.BLACK}
-${AnsiBackground.BRIGHT_YELLOW},--.                ,--.
-${AnsiBackground.BRIGHT_YELLOW}|  |    ,---. ,---. `--',--,--,
-${AnsiBackground.BRIGHT_YELLOW}|  |   | .-. | .-. |,--.|      \
-${AnsiBackground.BRIGHT_YELLOW}|  '--.' '-' ' '-' '|  ||  ||  |
-${AnsiBackground.BRIGHT_YELLOW}`-----' `---'.`-  / `--'`--''--'
-${AnsiBackground.BRIGHT_YELLOW}             `---'
-${AnsiBackground.DEFAULT}
-${AnsiColor.DEFAULT}
