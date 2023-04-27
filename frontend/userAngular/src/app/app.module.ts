@@ -7,11 +7,13 @@ import { CookieService } from 'ngx-cookie-service';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
+import { forgotPasswordComponent } from './forgotPassword/forgotPassword.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent
+    LoginComponent,
+    forgotPasswordComponent
   ],
   imports: [
     BrowserModule,

@@ -8,10 +8,14 @@ import { CookieService } from "ngx-cookie-service";
   providedIn: "root",
 })
 export class usersService {
-  constructor(private http: HttpClient, private cookies: CookieService) {}
+  constructor(private http: HttpClient , private cookies: CookieService) {}
 
   login(user: usuario): Observable<any> {
     return this.http.post("http://localhost:8080/usuarios/login", user);
+  }
+
+  forgotPassword(user: usuario): Observable<any> {
+    return this.http.post("http://localhost:8080/usuarios/forgotPassword", user);
   }
 
   setToken(token: string){
