@@ -1,0 +1,17 @@
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/entities/User.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/security/JwtRequestFilter.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/controllers/UserController.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/dto/PasswordresetDTO.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/service/exceptions/WrongCredentialsException.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/dto/UserDTO.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/security/JwtUtil.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/service/exceptions/UserNotFoundException.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/service/UserService.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/dto/RespuestaTokenDTO.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/security/JwtAuthenticationEntryPoint.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/security/SecurityConfig.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/repositories/UserRepository.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/dto/NotificationDTO.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/security/PasswordUtils.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/UserManagementApplication.java
+/Users/jacoboelichagarrucho/Desktop/2022-2023/Informática/Sistemas de Internet/tarea-1-southdevelopers/backend/userManagement/src/main/java/com/uma/southdevelopers/dto/LoginDTO.java
