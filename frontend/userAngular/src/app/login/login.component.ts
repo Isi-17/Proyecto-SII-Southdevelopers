@@ -15,9 +15,13 @@ export class LoginComponent {
   constructor(public userService: usersService, public router: Router) {}
 
   login() {
-    this.userService.login(this.usuario).subscribe((data) => { 
-      this.userService.setToken(data.token);
-      this.router.navigateByUrl("/");
+    this.userService.login(this.usuario).subscribe(
+      data => { 
+        this.userService.setToken(data.token);
+        this.router.navigateByUrl("/");
+    },
+    error => {
+      console.log(error);
     });
   }
 
