@@ -20,4 +20,8 @@ export class LoginComponent {
       this.router.navigateByUrl("/");
     });
   }
+
+  forgotpassword() {
+      this.router.navigateByUrl("/forgotPassword");
+  }
 }
