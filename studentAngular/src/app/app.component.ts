@@ -13,10 +13,15 @@ export class AppComponent {
   title = 'studentAngular';
   http = inject(HttpClient);
   institutos: Instituto[] = [];
+  searchValue!: number | null;
 
   constructor(private modalService: NgbModal) { }
 
   ngOnInit() {
+    this.obtainInstitutos();
+  }
+
+  obtainInstitutos() {
     this.http.get<Instituto[]>('http://localhost:8080/institutos')
       .subscribe((data) => {
         this.institutos = data;
@@ -26,10 +31,7 @@ export class AppComponent {
   deleteInstituto(id: number) {
     this.http.delete('http://localhost:8080/institutos/' + id)
     .subscribe(() => {
-      this.http.get<Instituto[]>('http://localhost:8080/institutos')
-        .subscribe((data) => {
-          this.institutos = data;
-        });
+      this.obtainInstitutos();
     }, (error) => {
         if(error.status === 409) {
           alert('No se puede eliminar el instituto porque hay estudiantes asociados a él.');
@@ -57,7 +59,7 @@ export class AppComponent {
   updateInstituto(instituto: Instituto): void {
     let ref = this.modalService.open(FormularioInstitutoComponent);
     ref.componentInstance.accion = "Editar";
-    ref.componentInstance.instituto = instituto;
+    ref.componentInstance.instituto = {...instituto};
     ref.result.then((instituto: Instituto) => {
       this.http.put<Instituto>('http://localhost:8080/institutos/'+instituto.id, instituto)
       .subscribe(() => {
@@ -67,6 +69,29 @@ export class AppComponent {
         });
       });
     }, (reason) => {});
+
+  }
+
+  searchInstituto(id: number | null): void {
+    if(id === null || id === undefined) {
+      this.obtainInstitutos();
+    } else {
+        this.http.get<Instituto>('http://localhost:8080/institutos/' + id)
+        .subscribe((data) => {
+          this.institutos = [];
+          this.institutos.push(data);
+          this.searchValue = null;
+        }, (error) => {
+          if(error.status === 404) {
+            alert('No se han encontrado institutos con ese id.');
+            this.searchValue = null;
+          } else if (error.status === 400) {
+            alert('El id introducido no es válido.');
+            this.searchValue = null;
+          }
+        });
+    }
+
 
   }
 

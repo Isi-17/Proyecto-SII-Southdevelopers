@@ -1,45 +1,77 @@
 <div class="container-fluid">
+
   <div class="row">
-    <div class="col">
-      <div class="row">
-        <h1>Institutos</h1>
-        <button (click)="addInstituto()" type="button" class="btn btn-outline-primary bi bi-plus-lg">Añadir un instituto</button>
-      </div>
-      <div class="list-group">
-        <div *ngFor="let instituto of institutos">
+    <div class="col-md-auto">
+      <h1>Institutos</h1>
+    </div>
+    <div class="col-md-auto d-flex align-items-center">
+      <button (click)="addInstituto()" type="button" class="btn btn-outline-primary bi bi-plus-lg">Añadir un
+        instituto</button>
+    </div>
+  </div>
 
 
 
-          <div ngbAccordion>
-            <div ngbAccordionItem>
-              <h2 ngbAccordionHeader>
-                <button ngbAccordionButton>{{instituto.nombre}}</button>
-              </h2>
-              <div ngbAccordionCollapse>
-                <div ngbAccordionBody>
-                  <ng-template>
-                    <div class="col-md-6">
-                      <p>ID: {{instituto.id}}</p>
-                      <p>Direccion1: {{instituto.direccion1}}</p>
-                      <p>Direccion2: {{instituto.direccion2}}</p>
-                    </div>
-                    <div class="col-md-6">
-                      <p>LOCALIDAD: {{instituto.localidad}}</p>
-                      <p>Codigo postal: {{instituto.codigoPostal}}</p>
-                      <p>Pais: {{instituto.pais}}</p>
-                    </div>
-                    <button (click)="deleteInstituto(instituto.id)" type="button" class="btn btn-outline-primary bi ">Eliminar instituto</button>
-                    <button (click)="updateInstituto(instituto)" type="button" class="btn btn-outline-primary bi ">Modificar instituto</button>
+  <div class="row g-2 form-group has-search">
+    <div class="col-9">
+      <input [(ngModel)]="searchValue" type="text" class="form-control" placeholder="Buscar por id">
+    </div>
+    <div class="col-md-auto">
+      <button (click)="searchInstituto(searchValue)" type="button" class="btn btn-outline-primary bi bi-search ">
+        Buscar
+      </button>
+    </div>
+    <div class="col-md-auto">
+      <button (click)="obtainInstitutos()" type="button" class="btn btn-outline-primary">
+        Obtener todos
+      </button>
+    </div>
+  </div>
 
-                  </ng-template>
+  <div class="list-group mt-2">
 
+    <div ngbAccordion>
+      <div ngbAccordionItem *ngFor="let instituto of institutos">
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>{{instituto.nombre}}</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <div class="row">
+                <div class="col-md-6">
+                  <p>Id: {{instituto.id}}</p>
+                  <p>Direccion1: {{instituto.direccion1}}</p>
+                  <p>Direccion2: {{instituto.direccion2}}</p>
                 </div>
+
+                <div class="col-md-6">
+                  <p>Localidad: {{instituto.localidad}}</p>
+                  <p>Codigo postal: {{instituto.codigoPostal}}</p>
+                  <p>Pais: {{instituto.pais}}</p>
+                </div>
+
               </div>
-            </div>
+
+              <div class="row">
+                <div class="col-md-auto">
+                  <button (click)="deleteInstituto(instituto.id)" type="button" class="btn btn-outline-danger">Eliminar
+                    instituto</button>
+                </div>
+                <div class="col-md-auto">
+                  <button (click)="updateInstituto(instituto)" type="button" class="btn btn-outline-primary">Editar
+                    instituto</button>
+                </div>
+
+              </div>
+
+            </ng-template>
           </div>
-          
         </div>
       </div>
     </div>
+
   </div>
+
+
 </div>
