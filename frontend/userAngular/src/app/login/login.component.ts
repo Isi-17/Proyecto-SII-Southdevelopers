@@ -12,6 +12,8 @@ export class LoginComponent {
   usuario: usuario = {email: '',
   password: ''};
 
+  incorrecto: boolean = false;
+
   constructor(public userService: usersService, public router: Router) {}
 
   login() {
@@ -22,6 +24,7 @@ export class LoginComponent {
     },
     error => {
       console.log(error);
+      this.incorrecto=true;
     });
   }
 

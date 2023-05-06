@@ -23,6 +23,13 @@
     font-size: 2rem;
     margin-bottom: 30px;
   }
+
+  p[type="badCredentials"]{
+      font-size: 1rem;
+      color: #ff0000;
+      font-style: italic;
+      padding: none;
+  }
   
   input[type="email"],
   input[type="password"] {

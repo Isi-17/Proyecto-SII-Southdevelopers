@@ -1,6 +1,7 @@
 <div class="login">
     <form class="custom-form" method="post">
       <h1>Login</h1>
+      <p type="badCredentials" *ngIf="incorrecto">Credenciales incorrectos</p>
       <input
         type="email"
         [(ngModel)]="usuario.email"
