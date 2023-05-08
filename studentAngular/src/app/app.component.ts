@@ -47,10 +47,7 @@ export class AppComponent {
     ref.result.then((instituto: Instituto) => {
       this.http.post<Instituto>('http://localhost:8080/institutos', instituto)
       .subscribe(() => {
-        this.http.get<Instituto[]>('http://localhost:8080/institutos')
-        .subscribe((data) => {
-          this.institutos = data;
-        });
+        this.obtainInstitutos();
       });
     }, (reason) => {});
 
@@ -63,10 +60,7 @@ export class AppComponent {
     ref.result.then((instituto: Instituto) => {
       this.http.put<Instituto>('http://localhost:8080/institutos/'+instituto.id, instituto)
       .subscribe(() => {
-        this.http.get<Instituto[]>('http://localhost:8080/institutos')
-        .subscribe((data) => {
-          this.institutos = data;
-        });
+        this.obtainInstitutos();
       });
     }, (reason) => {});
 

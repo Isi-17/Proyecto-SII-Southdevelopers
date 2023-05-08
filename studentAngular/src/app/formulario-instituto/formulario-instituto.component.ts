@@ -19,6 +19,4 @@ export class FormularioInstitutoComponent {
   guardarInstituto(): void {
     this.modal.close(this.instituto);
   }
-
-
 }
