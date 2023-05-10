@@ -37,10 +37,8 @@ export class InstitutosService {
     });
   }
 
-  addInstituto(instituto: Instituto): void {
-    this.http.post<Instituto>('http://localhost:8080/institutos', instituto)
-      .subscribe(() => {
-      });
+  addInstituto(instituto: Instituto): Observable<Instituto> {
+    return this.http.post<Instituto>('http://localhost:8080/institutos', instituto);
   }
 
   updateInstituto(instituto: Instituto): void {

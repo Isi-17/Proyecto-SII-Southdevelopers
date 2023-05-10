@@ -44,7 +44,7 @@ export class AppComponent {
     ref.componentInstance.instituto = {id: 0, nombre: '', direccion1: '', 
     direccion2: '', localidad: '', codigoPostal: 0, pais: ''};
     ref.result.then((instituto: Instituto) => {
-      this.institutosService.addInstituto(instituto);
+      this.institutosService.addInstituto(instituto).subscribe((data) => this.institutos.push(data));
       this.institutosService.obtainInstitutos().subscribe((data) => {
         this.institutos = data;
       });
