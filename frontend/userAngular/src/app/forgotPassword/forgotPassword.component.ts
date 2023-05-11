@@ -15,9 +15,24 @@ export class forgotPasswordComponent {
   constructor(public userService: usersService, public router: Router) {}
 
   forgotPassword() {
-    this.userService.forgotPassword(this.usuario).subscribe((data) => { 
-      // this.userService.setToken(data.token);
-      this.router.navigateByUrl("/");
+    this.userService.verifyEmail(this.usuario.email).subscribe((response) => {
+      if (response.exists) {
+        // El correo electrónico existe, realizar el reseteo de contraseña
+        this.userService.resetPassword(this.usuario.email).subscribe((data) => {
+          console.log('Nueva contraseña:', data.newPassword);
+          this.router.navigateByUrl("/");
+        }, (error) => {
+          // Mostrar mensaje de error al usuario
+          console.log('Error al resetear la contraseña:', error);
+          // Agregar código adicional según sea necesario
+          this.router.navigateByUrl("/");
+        });
+      } else {
+        // El correo electrónico no existe en la base de datos, mostrar un mensaje de error o tomar alguna acción apropiada
+        console.log('El correo electrónico no existe en la base de datos.');
+        // Agregar código adicional según sea necesario
+        this.router.navigateByUrl("/");
+      }
     });
   }
-}
+}  
