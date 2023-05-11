@@ -3,7 +3,7 @@
   <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cierre usuario')"></button>
 </div>
 <div class="modal-body">
-  <div class="form-group">
+  <div class="form-group" id="formulario">
     <label class="fw-bold" for="nombre">Nombre</label>
     <input class="form-control" id="nombre" [(ngModel)]="instituto.nombre">
     <label class="fw-bold" for="direccion1">Direccion1</label>
@@ -19,6 +19,6 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cerrar</button>
-  <button type="button" class="btn btn-outline-primary" (click)="guardarInstituto()">Guardar</button>
+  <button type="button" id="cerrar" class="btn btn-outline-secondary" data-dismiss="modal">Cerrar</button>
+  <button type="button" id="guardar" class="btn btn-outline-primary" (click)="guardarInstituto()">Guardar</button>
 </div>

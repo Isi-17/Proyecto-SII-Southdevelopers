@@ -14,10 +14,11 @@
 
   <div class="row g-2 form-group has-search">
     <div class="col-9">
-      <input [(ngModel)]="searchValue" type="text" class="form-control" placeholder="Buscar por id">
+      <input [(ngModel)]="searchValue" id="searchBar" type="text" class="form-control" placeholder="Buscar por id">
     </div>
     <div class="col-md-auto">
-      <button (click)="searchInstituto(searchValue)" type="button" class="btn btn-outline-primary bi bi-search ">
+      <button (click)="searchInstituto(searchValue)" id="searchId" type="button"
+        class="btn btn-outline-primary bi bi-search ">
         Buscar
       </button>
     </div>
@@ -55,7 +56,8 @@
 
               <div class="row">
                 <div class="col-md-auto">
-                  <button (click)="deleteInstituto(instituto.id)" type="button" class="btn btn-outline-danger">Eliminar
+                  <button (click)="deleteInstituto(instituto.id)" id="deleteButton" type="button"
+                    class="btn btn-outline-danger">Eliminar
                     instituto</button>
                 </div>
                 <div class="col-md-auto">
