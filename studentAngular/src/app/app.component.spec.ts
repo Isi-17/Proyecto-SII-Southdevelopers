@@ -4,6 +4,8 @@ import { AppComponent } from './app.component';
 import { Instituto } from './models/instituto.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
+import { TestScheduler } from 'rxjs/testing';
+import { bindNodeCallback } from 'rxjs';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -76,17 +78,24 @@ describe('AppComponent', () => {
 
     fixture.detectChanges();
 
-    const deleteButton = compiled.querySelector('#deleteButton') as HTMLButtonElement;
-    expect(deleteButton).toBeTruthy();
+    fixture.whenStable().then(() => {
+      const accordionBodies = document.querySelectorAll('div[ngbAccordionCollapse] > div[ngbAccordionBody]');
+      expect(accordionBodies.length).toBeGreaterThan(0);
 
-    deleteButton.click();
+      const accordionBody = accordionBodies[0] as HTMLElement;
+      expect(accordionBody).toBeTruthy();
+      console.log(accordionBody);
 
-    fixture.detectChanges();
+      const deleteButton = accordionBody.querySelector('#deleteButton') as HTMLButtonElement;
+      console.log(deleteButton);
+      expect(deleteButton).toBeTruthy();
+      deleteButton.click();
+      expect(component.institutos.length).toBe(0);
+    });
 
-    expect(component.institutos.length).toBe(0);
-  });
+  });
 
-  it('se ejecuta addInstituto() cuando el boton add se pulsa', () =>{
+  it('se ejecuta addInstituto() cuando el boton add se pulsa', () => {
 
     spyOn(component, 'addInstituto');
     const button = fixture.nativeElement.querySelector('.bi-plus-lg');
@@ -94,19 +103,11 @@ describe('AppComponent', () => {
     expect(component.addInstituto).toHaveBeenCalled();
   });
 
-  it('se ejecuta searchInstituto() cuando el boton search se pulsa', () =>{
+  it('se ejecuta searchInstituto() cuando el boton search se pulsa', () => {
 
     spyOn(component, 'searchInstituto');
     const button = fixture.nativeElement.querySelector('#searchId');
     button.click();
     expect(component.searchInstituto).toHaveBeenCalled();
   });
-  
-
-
-
-
-
-
-
 });
