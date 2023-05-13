@@ -39,6 +39,12 @@ describe('AppComponent', () => {
     component.institutos.push(instituto);
   });
 
+  it('se crea la apliacion correctamente', () => {
+
+    expect(component).toBeTruthy();
+
+  });
+
   it('Deberiamos obtener el instituto al buscar por el id', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
@@ -78,7 +84,28 @@ describe('AppComponent', () => {
     fixture.detectChanges();
 
     expect(component.institutos.length).toBe(0);
+  });
+
+  it('se ejecuta addInstituto() cuando el boton add se pulsa', () =>{
+
+    spyOn(component, 'addInstituto');
+    const button = fixture.nativeElement.querySelector('.bi-plus-lg');
+    button.click();
+    expect(component.addInstituto).toHaveBeenCalled();
   });
+
+  it('se ejecuta searchInstituto() cuando el boton search se pulsa', () =>{
+
+    spyOn(component, 'searchInstituto');
+    const button = fixture.nativeElement.querySelector('#searchId');
+    button.click();
+    expect(component.searchInstituto).toHaveBeenCalled();
+  });
+  
+
+
+
+
 
 
 
