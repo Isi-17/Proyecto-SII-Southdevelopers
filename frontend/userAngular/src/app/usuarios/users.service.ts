@@ -37,8 +37,4 @@ export class usersService {
   getToken(){
     return this.cookies.get("token");
   }
-
-
-
-
 }
