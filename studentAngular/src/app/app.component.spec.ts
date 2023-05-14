@@ -4,8 +4,7 @@ import { AppComponent } from './app.component';
 import { Instituto } from './models/instituto.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
-import { TestScheduler } from 'rxjs/testing';
-import { bindNodeCallback } from 'rxjs';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -17,6 +16,7 @@ describe('AppComponent', () => {
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
+        NgbModule,
         FormsModule
       ],
       declarations: [
@@ -39,6 +39,7 @@ describe('AppComponent', () => {
     }
 
     component.institutos.push(instituto);
+
   });
 
   it('se crea la apliacion correctamente', () => {
@@ -95,19 +96,28 @@ describe('AppComponent', () => {
 
   });
 
-  it('se ejecuta addInstituto() cuando el boton add se pulsa', () => {
+  it('Se debe ejecutar addInstituto() cuando el boton add se pulsa', () => {
 
-    spyOn(component, 'addInstituto');
-    const button = fixture.nativeElement.querySelector('.bi-plus-lg');
+    spyOn(component, 'addInstituto').and.callThrough();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const button = compiled.querySelector('#addButton') as HTMLButtonElement;
     button.click();
     expect(component.addInstituto).toHaveBeenCalled();
+
+    fixture.detectChanges();
+
+    fixture.whenStable().then(() => {
+      const modal = fixture.nativeElement.querySelector('.modal-header');
+      expect(modal).not.toBeNull();
+    });
   });
 
-  it('se ejecuta searchInstituto() cuando el boton search se pulsa', () => {
+  it('Se debe ejecutar obtainInstitutos() cuando el boton search se pulsa', () => {
 
-    spyOn(component, 'searchInstituto');
-    const button = fixture.nativeElement.querySelector('#searchId');
+    spyOn(component, 'obtainInstitutos').and.callThrough();
+    const button = fixture.nativeElement.querySelector('#searchAll');
     button.click();
-    expect(component.searchInstituto).toHaveBeenCalled();
+    expect(component.obtainInstitutos).toHaveBeenCalled();
+    expect(component.institutos.length).toBeGreaterThan(0);
   });
 });
