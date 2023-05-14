@@ -2,7 +2,7 @@
   <h4 class="modal-title" id="modal-basic-title">{{accion}} instituto</h4>
   <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cierre usuario')"></button>
 </div>
-<div class="modal-body">
+<div class="modal-body" id="modal">
   <div class="form-group" id="formulario">
     <label class="fw-bold" for="nombre">Nombre</label>
     <input class="form-control" id="nombre" [(ngModel)]="instituto.nombre">

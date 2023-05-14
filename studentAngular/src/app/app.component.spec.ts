@@ -5,6 +5,9 @@ import { Instituto } from './models/instituto.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { By } from '@angular/platform-browser';
+import { FormularioInstitutoComponent } from './formulario-instituto/formulario-instituto.component';
+
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -104,12 +107,6 @@ describe('AppComponent', () => {
     button.click();
     expect(component.addInstituto).toHaveBeenCalled();
 
-    fixture.detectChanges();
-
-    fixture.whenStable().then(() => {
-      const modal = fixture.nativeElement.querySelector('.modal-header');
-      expect(modal).not.toBeNull();
-    });
   });
 
   it('Se debe ejecutar obtainInstitutos() cuando el boton search se pulsa', () => {

@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Instituto } from './models/instituto.model';
 import { Observable } from 'rxjs';
@@ -10,9 +10,7 @@ export class InstitutosService {
 
   institutos: Instituto[] = [];
 
-  http = inject(HttpClient);
-
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
   obtainInstitutos(): Observable<Instituto[]> {
     return this.http.get<Instituto[]>('http://localhost:8080/institutos');

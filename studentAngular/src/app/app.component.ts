@@ -4,7 +4,6 @@ import { Instituto } from './models/instituto.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormularioInstitutoComponent } from './formulario-instituto/formulario-instituto.component';
 import { InstitutosService } from './institutos.service';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 @Component({
   selector: 'app-root',
