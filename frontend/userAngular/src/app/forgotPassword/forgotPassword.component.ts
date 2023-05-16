@@ -9,19 +9,18 @@ import { Router } from '@angular/router';
   styleUrls: ['./forgotPassword.component.css']
 })
 export class ForgotPasswordComponent {
-  usuario: usuario = {email: '',
-  password: ''};
+  email: string = '';
 
   constructor(public userService: usersService, public router: Router) {}
 
   forgotPassword() {
-    this.userService.resetPassword(this.usuario.email).subscribe((data) => {
-      console.log('Nueva contraseña:', data.newPassword); // Para las pruebas
-      this.router.navigateByUrl("/");
-    }, (error) => {
-      // Mostrar mensaje de error al usuario
+    this.userService.resetPassword(this.email).subscribe(
+      data => {
+      alert('Debug: La nueva contraseña es '+data);
+      this.router.navigateByUrl("/login");
+    },
+      error => {
       console.log('Error al resetear la contraseña:', error);
-      this.router.navigateByUrl("/");
     });
   }
 }  

@@ -20,8 +20,9 @@ export class usersService {
   // forgotPassword(email: string): Observable<any> {
   //   return this.http.post("http://localhost:8080/usuarios/forgotPassword", { email });
   // }
+  
   resetPassword(email: string): Observable<any> {
-    return this.http.post("http://localhost:8080/usuarios/forgotPassword", { email });
+    return this.http.post("http://localhost:8080/usuarios/passwordreset", {'email': email}, {responseType: 'text'});
   }
 
   setToken(token: string){

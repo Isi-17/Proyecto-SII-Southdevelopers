@@ -35,16 +35,15 @@ public class SecurityConfig {
                 .cors()
                 .and()
                 .csrf().disable()
-                // dont authenticate this particular request
                 .authorizeHttpRequests()
                 .requestMatchers("/usuarios/login")
                 .permitAll()
                 .requestMatchers(HttpMethod.POST,"/usuarios/passwordreset")
                 .permitAll()
-//                .requestMatchers(HttpMethod.POST, "/usuarios") // TODO: sin autorizacion para las pruebas, pedir autorizacion
-//                .permitAll()
-                .requestMatchers(HttpMethod.POST, "/usuarios")
-                .hasAnyRole("VICERRECTORADO", "ROLE_VICERRECTORADO")
+                .requestMatchers(HttpMethod.POST, "/usuarios") // TODO: sin autorizacion para las pruebas, pedir autorizacion
+                .permitAll()
+//                .requestMatchers(HttpMethod.POST, "/usuarios")
+//                .hasAnyRole("VICERRECTORADO", "ROLE_VICERRECTORADO")
 		        .requestMatchers(HttpMethod.GET, "/usuarios/**")
                 .hasAnyRole("ROLE_RESPONSABLE_AULA","ROLE_VIGILANTE_AULA", "RESPONSABLE_AULA","VIGILANTE_AULA",
                         "VICERRECTORADO", "ROLE_VICERRECTORADO", "ROLE_CORRECTOR", "CORRECTOR")
