@@ -23,11 +23,11 @@ describe('AppComponent', () => {
 
   });
 
-  it('should create the app', () => {
+  it('Se crea la app', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'userAngular'`, () => {
+  it(`El nombre es 'userAngular'`, () => {
     expect(app.title).toEqual('userAngular');
   });
 });

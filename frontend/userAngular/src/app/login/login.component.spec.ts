@@ -23,7 +23,7 @@ describe('LoginComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should create', () => {
+  it('Se crea correctamente el componente', () => {
     expect(component).toBeTruthy();
   });
 
@@ -40,5 +40,36 @@ describe('LoginComponent', () => {
     expect(loginBoton).toBeTruthy();
     const forgotPasswordBoton = compiled.querySelector('#forgotPassword') as HTMLButtonElement;
     expect(forgotPasswordBoton).toBeTruthy();
+  });
+
+  it('Debe aparecer el formulario vacío', () => {
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const emailInput = compiled.querySelector('#email') as HTMLInputElement;
+    expect(emailInput.value).toEqual('');
+    const passwordInput = compiled.querySelector('#password') as HTMLInputElement;
+    expect(passwordInput.value).toEqual('');
+    const loginBoton = compiled.querySelector('#login') as HTMLButtonElement;
+    expect(loginBoton.value).toEqual('');
+    const forgotPasswordBoton = compiled.querySelector('#forgotPassword') as HTMLButtonElement;
+    expect(forgotPasswordBoton.value).toEqual('');
+  });
+
+  it('Se debe ejecutar forgotpassword() cuando el boton submit se pulsa el boton para recuperar la contraseña', () => {
+    spyOn(component, 'forgotpassword').and.callThrough();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const button = compiled.querySelector('#forgotPassword') as HTMLButtonElement;
+    button.click();
+    expect(component.forgotpassword).toHaveBeenCalled();
+  });
+
+  it('Se debe ejecutar login() cuando el boton submit se pulsa el boton de submit', () => {
+    spyOn(component, 'login').and.callThrough();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const button = compiled.querySelector('#login') as HTMLButtonElement;
+    button.click();
+    expect(component.login).toHaveBeenCalled();
+
   });
 });

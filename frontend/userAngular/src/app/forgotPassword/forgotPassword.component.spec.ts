@@ -48,4 +48,13 @@ describe('forgotPasswordComponent', () => {
     expect(nombre.value).toEqual('');
   });
 
+  it('Se debe ejecutar forgotPassword() cuando el boton se pulsa', () => {
+
+    spyOn(component, 'forgotPassword').and.callThrough();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const button = compiled.querySelector('#submit') as HTMLButtonElement;
+    button.click();
+    expect(component.forgotPassword).toHaveBeenCalled();
+
+  });
 });

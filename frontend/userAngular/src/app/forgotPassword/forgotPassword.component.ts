@@ -16,8 +16,12 @@ export class ForgotPasswordComponent {
   forgotPassword() {
     this.userService.resetPassword(this.email).subscribe(
       data => {
-      alert('Debug: La nueva contraseña es '+data);
-      this.router.navigateByUrl("/login");
+        if(data) {
+          alert('Debug: La nueva contraseña es '+data);
+        } else {
+          alert('Debug: El email no existe en la base de datos');
+        }
+        this.router.navigateByUrl("/login");
     },
       error => {
       console.log('Error al resetear la contraseña:', error);

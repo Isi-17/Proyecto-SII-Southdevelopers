@@ -25,9 +25,7 @@ describe('UsersService', () => {
     httpMock.verify();
   });
 
-  it('should be created', () => {
+  it('El servicio se crea correctamente', () => {
     expect(service).toBeTruthy();
   });
-
-  it('')
 });
