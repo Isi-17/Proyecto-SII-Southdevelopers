@@ -24,7 +24,7 @@ describe('InstitutosService', () => {
     httpMock.verify();
   });
 
-  it('should be created', () => {
+  it('El service se crea correctamente', () => {
     expect(service).toBeTruthy();
   });
 

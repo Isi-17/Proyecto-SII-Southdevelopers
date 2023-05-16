@@ -5,14 +5,12 @@ import { Instituto } from './models/instituto.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { By } from '@angular/platform-browser';
-import { FormularioInstitutoComponent } from './formulario-instituto/formulario-instituto.component';
-
 
 describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
-  let instituto: Instituto;
+  let instituto1: Instituto;
+  let instituto2: Instituto;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -31,7 +29,7 @@ describe('AppComponent', () => {
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
 
-    instituto = {
+    instituto1 = {
       id: 1,
       nombre: 'IES 1',
       direccion1: 'Calle 1',
@@ -41,13 +39,44 @@ describe('AppComponent', () => {
       pais: 'Pais 1'
     }
 
-    component.institutos.push(instituto);
+    component.institutos.push(instituto1);
+
+    instituto2 = {
+      id: 2,
+      nombre: 'IES 2',
+      direccion1: 'Calle 1',
+      direccion2: 'Calle 2',
+      localidad: 'Localidad 1',
+      codigoPostal: 11111,
+      pais: 'Pais 1'
+    }
+
+    component.institutos.push(instituto2);
 
   });
 
-  it('se crea la apliacion correctamente', () => {
+  it('Deberamos obtener todos los institutos al darle a obtener todos, despues de buscar por id', () => {
 
-    expect(component).toBeTruthy();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const searchBar = compiled.querySelector('#searchBar') as HTMLInputElement;
+    searchBar.value = '1';
+    const searchButton = compiled.querySelector('#searchId') as HTMLButtonElement;
+    searchButton.click();
+
+    fixture.detectChanges();
+
+    var accordionButtons = compiled.querySelectorAll('button[ngbAccordionButton]');
+    expect(accordionButtons.length).toBeGreaterThan(0);
+
+    const firstButton = accordionButtons[0];
+    expect(firstButton.textContent).toEqual(instituto1.nombre);
+
+    const searchAllButton = compiled.querySelector('#searchAll') as HTMLButtonElement;
+    searchAllButton.click();
+
+    accordionButtons = compiled.querySelectorAll('button[ngbAccordionButton]');
+    expect(accordionButtons.length).toBe(2);
 
   });
 
@@ -65,7 +94,7 @@ describe('AppComponent', () => {
     expect(accordionButtons.length).toBeGreaterThan(0);
 
     const firstButton = accordionButtons[0];
-    expect(firstButton.textContent).toEqual(instituto.nombre);
+    expect(firstButton.textContent).toEqual(instituto1.nombre);
   });
 
   it('Al darle al boton de eliminar el instituto se elimina', () => {
