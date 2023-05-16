@@ -24,14 +24,8 @@ export class usersService {
     return this.http.post("http://localhost:8080/usuarios/forgotPassword", { email });
   }
 
-  verifyEmail(email: string): Observable<any> {
-    // Realiza la solicitud HTTP al backend para verificar si el correo electrónico existe en la base de datos
-    return this.http.get<any>(`http://localhost:8080/usuarios/forgotPassword?email=${email}`);
-  }
-  
-
   setToken(token: string){
-    this.cookies.set("token",token);
+    this.cookies.set("token", token);
   }
 
   getToken(){
