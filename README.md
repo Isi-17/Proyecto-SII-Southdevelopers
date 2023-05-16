@@ -72,3 +72,19 @@ Cada microservicio cuenta con un conjunto de casos de prueba desarrolladas con J
 - `userManagementTest.java`: casos de prueba para el microservicio de Gestión de Usuarios.
 - `StudentManegementApplicationTests.java`: casos de prueba para el microservicio de Gestión del Estudiantado.
 
+# Tarea 3 - Frontend para la aplicación
+
+En esta tarea, el grupo **SouthDevelopers** ha desarrollado una aplicación Angular para cada microservicio del proyecto. Cada aplicación Angular implementa un conjunto de requisitos específicos relacionados con el microservicio correspondiente.
+
+La aplicación Angular está ubicada en el mismo repositorio que el microservicio de Gestión de Usuarios, en una carpeta que contiene la cadena "frontend". El repositorio contiene los siguientes elementos:
+- Los microservicios implementados en Spring necesarios para respaldar la ejecución de la aplicación Angular. Estos microservicios ya fueron entregados en la tarea T2, pero podrían haber sufrido modificaciones para corregir posibles errores.
+- Una aplicación Angular que conste de uno o varios componentes y al menos un servicio que se conecte con el microservicio implementado en Spring.
+- Un conjunto de casos de prueba para cada componente, con al menos tres pruebas por componente y un mínimo de cinco pruebas por cada aplicación.
+
+## Microservicio de Gestión de Usuarios
+
+Para este microservicio, se ha implementado la funcionalidad de login y reseteo de contraseña. La aplicación Angular permite a un usuario iniciar sesión utilizando sus credenciales y obtener un token JWT para acceder a los servicios. Además, se proporciona la opción de resetear la contraseña en caso de que el usuario la haya olvidado. La nueva contraseña generada se muestra en el registro de actividad del microservicio.
+
+## Microservicio de Gestión del Estudiantado
+
+Para este microservicio, se ha implementado el CRUD (Crear, Leer, Actualizar, Eliminar) de institutos. La aplicación Angular permite visualizar los institutos registrados en el sistema, editar su información, añadir nuevos institutos y eliminarlos según sea necesario.
