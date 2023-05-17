@@ -56,7 +56,7 @@ describe('LoginComponent', () => {
     expect(forgotPasswordBoton.value).toEqual('');
   });
 
-  it('Se debe ejecutar forgotpassword() cuando el boton submit se pulsa el boton para recuperar la contraseña', () => {
+  it('Se debe ejecutar forgotPassword() cuando el boton submit se pulsa el boton para recuperar la contraseña', () => {
     spyOn(component, 'forgotpassword').and.callThrough();
     const compiled = fixture.nativeElement as HTMLElement;
     const button = compiled.querySelector('#forgotPassword') as HTMLButtonElement;
