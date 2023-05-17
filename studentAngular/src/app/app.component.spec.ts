@@ -55,7 +55,7 @@ describe('AppComponent', () => {
 
   });
 
-  it('Deberamos obtener todos los institutos al darle a obtener todos, despues de buscar por id', () => {
+  it('Deberiamos obtener todos los institutos al darle a obtener todos, despues de buscar por id', () => {
 
 
     const compiled = fixture.nativeElement as HTMLElement;
