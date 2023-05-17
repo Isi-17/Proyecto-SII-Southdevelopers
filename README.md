@@ -67,7 +67,7 @@ La clase `StudentManagementApplication.java` contiene la clase principal del mic
 
 ## Casos de prueba
 
-Cada microservicio cuenta con un conjunto de casos de prueba desarrolladas con JUnit 5. Los casos de prueba se encuentran en las siguientes clases:
+Cada microservicio cuenta con un conjunto de casos de prueba desarrolladas con JUnit 5. Los casos de prueba se encuentran en los siguientes ficheros:
 
 - `userManagementTest.java`: casos de prueba para el microservicio de Gestión de Usuarios.
 - `StudentManegementApplicationTests.java`: casos de prueba para el microservicio de Gestión del Estudiantado.
@@ -85,6 +85,56 @@ La aplicación Angular está ubicada en el mismo repositorio que el microservici
 
 Para este microservicio, se ha implementado la funcionalidad de login y reseteo de contraseña. La aplicación Angular permite a un usuario iniciar sesión utilizando sus credenciales y obtener un token JWT para acceder a los servicios. Además, se proporciona la opción de resetear la contraseña en caso de que el usuario la haya olvidado. La nueva contraseña generada se muestra en el registro de actividad del microservicio.
 
+
 ## Microservicio de Gestión del Estudiantado
 
 Para este microservicio, se ha implementado el CRUD (Crear, Leer, Actualizar, Eliminar) de institutos. La aplicación Angular permite visualizar los institutos registrados en el sistema, editar su información, añadir nuevos institutos y eliminarlos según sea necesario.
+
+## Casos de prueba
+
+Cada microservicio cuenta con un conjunto de casos de prueba desarrollados con el framework de pruebas de Angular.
+
+### Microservicio de Gestión de Usuarios
+
+Los casos de prueba para el microservicio de Gestión de Usuarios se encuentran en los siguientes ficheros:
+
+- `app.component.spec.ts`
+  * El nombre es 'userAngular'
+  * Se crea la app
+- `users.service.spec.ts`
+  * El servicio se crea correctamente
+- `login.component.spec.ts`
+  * Se debe ejecutar forgotPassword() cuando el botón submit se pulsa el botón para recuperar la contraseña
+  * Se debe ejecutar login() cuando el botón sunmit se pulsa el botón de submit
+  * Se crea correctamente el componenete
+  * Debe aparecer el formulario vacío
+  * Debe generar correctamente la página de login
+- `forgotPassword.component.spec.ts`
+  * Se crea correctamente el componente
+  * Debe aparecer el formulario vacío
+  * Debe generar correctamente la página de recuperación de contraseña
+  * Se debe ejecutar forgotPassword() cuando el botón se pulsa
+
+### Microservicio de Gestión de Institutos
+
+Los casos de prueba para el microservicio de Gestión de Institutos se encuentran en los siguientes ficheros:
+
+- `app.component.spec.ts`
+  * Al darle al botón de eliminar el instituto se elimina
+  * Se debe ejecutar addInstituto() cuando el boton add se pulsa
+  * Se debe ejecutar obtainInstitutos() cuando el botón search se pulsa
+  * Deberíamos obtener el instituto al buscar por el id
+  * Deberíamos obtener todos los institutos al darle a obtener todos, después de buscar por id
+- `institutos.service.spec.ts`
+  * El service se crea correctamente
+- `formulario-instituto.component.spec.ts`
+  * Debe aparecer el formulario con los datos del instituto y con el texto editar instituto
+  * Debe generar correctamente el formulario con los inputs y botones necesarios
+  * Debe aparecer el formulario vacío y con el texto añadir instituto
+
+
+
+
+
+
+
