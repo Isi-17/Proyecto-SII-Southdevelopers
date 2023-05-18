@@ -1,0 +1,32 @@
+<div class="login">
+    <form class="custom-form" method="post">
+      <h1>Login</h1>
+      <p type="badCredentials" *ngIf="incorrecto">Credenciales incorrectos</p>
+      <input
+        type="email"
+        [(ngModel)]="usuario.email"
+        name="email"
+        id="email"
+        placeholder="Email"
+        required="required"
+      />
+      <input
+        type="password"
+        [(ngModel)]="usuario.password"
+        name="password"
+        id="password"
+        placeholder="Password"
+        required="required"
+      />
+      <button type="submit" id="login" (click)="login()">Log in</button>
+
+      <!--  <a href="/forgotPassword" class="forgotPassword">I forgot my password</a>  -->
+      <br>
+      
+      <button type="submit" id="forgotPassword" (click)="forgotpassword()">I forgot my password</button> 
+    
+    </form>
+  </div>
+  
+
+  
