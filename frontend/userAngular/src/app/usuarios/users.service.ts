@@ -14,12 +14,19 @@ export class usersService {
     return this.http.post("http://localhost:8080/usuarios/login", user);
   }
 
-  forgotPassword(user: usuario): Observable<any> {
-    return this.http.post("http://localhost:8080/usuarios/forgotPassword", user);
+  // forgotPassword(user: usuario): Observable<any> {
+  //   return this.http.post("http://localhost:8080/usuarios/forgotPassword", user);
+  // }
+  // forgotPassword(email: string): Observable<any> {
+  //   return this.http.post("http://localhost:8080/usuarios/forgotPassword", { email });
+  // }
+  
+  resetPassword(email: string): Observable<any> {
+    return this.http.post("http://localhost:8080/usuarios/passwordreset", {'email': email}, {responseType: 'text'});
   }
 
   setToken(token: string){
-    this.cookies.set("token",token);
+    this.cookies.set("token", token);
   }
 
   getToken(){
