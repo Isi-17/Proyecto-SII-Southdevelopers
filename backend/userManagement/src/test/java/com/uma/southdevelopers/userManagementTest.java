@@ -518,6 +518,7 @@ public class userManagementTest {
                     .endsWith("/"+user.getUserId());
         }
 
+        /* Las autorizaciones de este recurso están comentadas para hacer pruebas con el frontend. Test inutilizado. */
         @Test
         @DisplayName("Usuario no creado por acceso no autorizado (403)")
         public void nonVicerrectorUserCreation(){
