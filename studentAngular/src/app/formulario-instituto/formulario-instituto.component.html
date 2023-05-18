@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">{{accion}} instituto</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cierre usuario')"></button>
+</div>
+<div class="modal-body" id="modal">
+  <div class="form-group" id="formulario">
+    <label class="fw-bold" for="nombre">Nombre</label>
+    <input class="form-control" id="nombre" [(ngModel)]="instituto.nombre">
+    <label class="fw-bold" for="direccion1">Direccion1</label>
+    <input class="form-control" id="direccion1" [(ngModel)]="instituto.direccion1">
+    <label class="fw-bold" for="direccion2">Direccion2</label>
+    <input class="form-control" id="direccion2" [(ngModel)]="instituto.direccion2">
+    <label class="fw-bold" for="localidad">Localidad</label>
+    <input class="form-control" id="localidad" [(ngModel)]="instituto.localidad">
+    <label class="fw-bold" for="codigoPostal">Codigo Postal</label>
+    <input class="form-control" id="codigoPostal" [(ngModel)]="instituto.codigoPostal">
+    <label class="fw-bold" for="pais">Pais</label>
+    <input class="form-control" id="pais" [(ngModel)]="instituto.pais">
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" id="cerrar" class="btn btn-outline-secondary" data-dismiss="modal">Cerrar</button>
+  <button type="button" id="guardar" class="btn btn-outline-primary" (click)="guardarInstituto()">Guardar</button>
+</div>

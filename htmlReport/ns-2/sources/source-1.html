@@ -1,0 +1,192 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > InstituteController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.uma.southdevelopers.controllers</a>
+</div>
+
+<h1>Coverage Summary for Class: InstituteController (com.uma.southdevelopers.controllers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InstituteController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (26/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.uma.southdevelopers.controllers;
+&nbsp;
+&nbsp;
+&nbsp;import com.uma.southdevelopers.dtos.InstituteDTO;
+&nbsp;import com.uma.southdevelopers.entities.Institute;
+&nbsp;import com.uma.southdevelopers.entities.Student;
+&nbsp;import com.uma.southdevelopers.service.InstituteDBService;
+&nbsp;import com.uma.southdevelopers.service.StudentDBService;
+&nbsp;import com.uma.southdevelopers.service.exceptions.EntityNotFoundException;
+&nbsp;import com.uma.southdevelopers.service.exceptions.InstitutoDoNotDeleteException;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;import org.springframework.web.util.UriComponents;
+&nbsp;import org.springframework.web.util.UriComponentsBuilder;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.net.URI;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(path = &quot;/institutos&quot;)
+&nbsp;public class InstituteController {
+&nbsp;
+&nbsp;    public InstituteDBService service;
+&nbsp;    public StudentDBService studentService;
+&nbsp;
+<b class="fc">&nbsp;    public InstituteController(InstituteDBService service, StudentDBService studentService) {</b>
+<b class="fc">&nbsp;        this.service = service;</b>
+<b class="fc">&nbsp;        this.studentService = studentService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping
+&nbsp;    public List&lt;InstituteDTO&gt; obtainInstitutes() {
+<b class="fc">&nbsp;        var institutes = service.allInstitutes();</b>
+<b class="fc">&nbsp;        Function&lt;Institute, InstituteDTO&gt; mapper = (p -&gt;</b>
+<b class="fc">&nbsp;                InstituteDTO.fromInstitute(p));</b>
+<b class="fc">&nbsp;        return institutes.stream()</b>
+<b class="fc">&nbsp;                .map(mapper)</b>
+<b class="fc">&nbsp;                .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping
+&nbsp;    @ResponseStatus(code=HttpStatus.CREATED)
+&nbsp;    public Institute addInstitute(@RequestBody InstituteDTO institute, UriComponentsBuilder uriBuilder) {
+<b class="fc">&nbsp;        Institute inst = institute.institute();</b>
+<b class="fc">&nbsp;        Long id = service.addInstitute(inst);</b>
+<b class="fc">&nbsp;        inst.setId(id);</b>
+<b class="fc">&nbsp;        return inst;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{id}&quot;)
+&nbsp;    @ResponseStatus(code=HttpStatus.OK)
+&nbsp;    public InstituteDTO obtainInstitute(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
+<b class="fc">&nbsp;        Institute institute = service.obtainInstitute(id);</b>
+<b class="fc">&nbsp;        return InstituteDTO.fromInstitute(institute);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{id}&quot;)
+&nbsp;    @ResponseStatus(code=HttpStatus.OK)
+&nbsp;    public Institute updateInstitute(@PathVariable Long id, @RequestBody InstituteDTO institute) {
+<b class="fc">&nbsp;        Institute entidadInstituto = institute.institute();</b>
+<b class="fc">&nbsp;        entidadInstituto.setId(id);</b>
+<b class="fc">&nbsp;        service.updateInstitute(entidadInstituto);</b>
+<b class="fc">&nbsp;        return entidadInstituto;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+&nbsp;    public void deleteInstitute(@PathVariable Long id) {
+<b class="fc">&nbsp;        Institute institute = service.obtainInstitute(id);</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;Student&gt; students = studentService.obtainStudentFromInstitute(institute);</b>
+&nbsp;
+<b class="fc">&nbsp;        if(students.size() &gt; 0) {</b>
+<b class="fc">&nbsp;            throw new InstitutoDoNotDeleteException();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        service.deleteInstitute(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ExceptionHandler(EntityNotFoundException.class)
+&nbsp;    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+<b class="fc">&nbsp;    public void notFound() {}</b>
+&nbsp;
+&nbsp;    @ExceptionHandler(InstitutoDoNotDeleteException.class)
+&nbsp;    @ResponseStatus(code = HttpStatus.CONFLICT)
+<b class="fc">&nbsp;    public void instituteWithStudents() {}</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-04-24 19:08</div>
+</div>
+</body>
+</html>
