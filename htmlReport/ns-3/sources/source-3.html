@@ -1,0 +1,182 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > InstituteDTO</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.uma.southdevelopers.dtos</a>
+</div>
+
+<h1>Coverage Summary for Class: InstituteDTO (com.uma.southdevelopers.dtos)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InstituteDTO</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (29/29)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">InstituteDTO$InstituteDTOBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.uma.southdevelopers.dtos;
+&nbsp;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonProperty;
+&nbsp;import com.uma.southdevelopers.entities.Institute;
+&nbsp;import lombok.*;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;@Getter
+<b class="fc">&nbsp;@Setter</b>
+<b class="fc">&nbsp;@NoArgsConstructor</b>
+<b class="fc">&nbsp;@AllArgsConstructor</b>
+<b class="fc">&nbsp;@Builder</b>
+&nbsp;public class InstituteDTO {
+<b class="fc">&nbsp;    private Long id;</b>
+<b class="fc">&nbsp;    private String nombre;</b>
+<b class="fc">&nbsp;    private String direccion1;</b>
+<b class="fc">&nbsp;    private String direccion2;</b>
+<b class="fc">&nbsp;    private String localidad;</b>
+<b class="fc">&nbsp;    private Integer codigoPostal;</b>
+<b class="fc">&nbsp;    private String pais;</b>
+&nbsp;
+&nbsp;
+&nbsp;    public static InstituteDTO fromInstitute(Institute institute) {
+<b class="fc">&nbsp;        var dto = new InstituteDTO();</b>
+&nbsp;
+<b class="fc">&nbsp;        dto.setId(institute.getId());</b>
+<b class="fc">&nbsp;        dto.setNombre(institute.getNombre());</b>
+<b class="fc">&nbsp;        dto.setDireccion1(institute.getDireccion1());</b>
+<b class="fc">&nbsp;        dto.setDireccion2(institute.getDireccion2());</b>
+<b class="fc">&nbsp;        dto.setLocalidad(institute.getLocalidad());</b>
+<b class="fc">&nbsp;        dto.setCodigoPostal(institute.getCodigoPostal());</b>
+<b class="fc">&nbsp;        dto.setPais(institute.getPais());</b>
+&nbsp;
+<b class="fc">&nbsp;        return dto;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Institute institute() {
+<b class="fc">&nbsp;        var inst = new Institute();</b>
+&nbsp;
+<b class="fc">&nbsp;        inst.setId(id);</b>
+<b class="fc">&nbsp;        inst.setNombre(nombre);</b>
+<b class="fc">&nbsp;        inst.setDireccion1(direccion1);</b>
+<b class="fc">&nbsp;        inst.setDireccion2(direccion2);</b>
+<b class="fc">&nbsp;        inst.setLocalidad(localidad);</b>
+<b class="fc">&nbsp;        inst.setCodigoPostal(codigoPostal);</b>
+<b class="fc">&nbsp;        inst.setPais(pais);</b>
+&nbsp;
+<b class="fc">&nbsp;        return inst;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-04-24 19:08</div>
+</div>
+</body>
+</html>
