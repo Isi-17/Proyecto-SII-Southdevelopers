@@ -4,4 +4,5 @@
 /userManagement/target
 .DS_Store
 /htmlReport
+/frontend/userAngular
 /frontend/studentAngular/node_modules
